@@ -1,0 +1,203 @@
+{
+  "name": "Medicine",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Kode obat/produk internal"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nama obat / nama dagang / nama produk"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "Obat",
+        "OTC",
+        "Alkes",
+        "Produk Umum"
+      ],
+      "default": "Obat"
+    },
+    "generic_name": {
+      "type": "string",
+      "description": "Nama generik / zat aktif"
+    },
+    "active_substance": {
+      "type": "string",
+      "description": "Kandungan zat aktif"
+    },
+    "strength": {
+      "type": "string",
+      "description": "Kekuatan, mis. 500mg"
+    },
+    "form": {
+      "type": "string",
+      "enum": [
+        "Tablet",
+        "Kapsul",
+        "Sirup",
+        "Salep",
+        "Injeksi",
+        "Tetes",
+        "Suspensi",
+        "Serbuk",
+        "Lainnya"
+      ],
+      "default": "Tablet"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Obat Bebas",
+        "Obat Bebas Terbatas",
+        "Obat Keras",
+        "Narkotika/Psikotropika",
+        "Bebas Bebas",
+        "Suplemen"
+      ],
+      "default": "Obat Bebas"
+    },
+    "is_narcotic": {
+      "type": "boolean",
+      "default": false,
+      "description": "True untuk obat golongan narkotika/psikotropika (derived dari category)"
+    },
+    "barcode": {
+      "type": "string"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "shelf_location": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "string",
+      "description": "Satuan terkecil: tablet, kapsul, botol, tube"
+    },
+    "conversion_box": {
+      "type": "number",
+      "description": "Jumlah unit per box",
+      "default": 0
+    },
+    "conversion_strip": {
+      "type": "number",
+      "description": "Jumlah unit per strip",
+      "default": 0
+    },
+    "conversion_tablet": {
+      "type": "number",
+      "description": "Jumlah unit per kemasan terkecil (tablet/botol)",
+      "default": 0
+    },
+    "selling_price": {
+      "type": "number"
+    },
+    "purchase_price": {
+      "type": "number"
+    },
+    "margin_percent": {
+      "type": "number",
+      "description": "Margin auto-calc: (selling-purchase)/purchase*100",
+      "default": 0
+    },
+    "target_margin_default": {
+      "type": "number",
+      "default": 30,
+      "description": "Target margin default (%) dari pengaturan Penentuan Harga"
+    },
+    "min_safe_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Harga Minimum Aman \u2014 dihitung ulang saat faktur/perubahan harga"
+    },
+    "price_protection_active": {
+      "type": "boolean",
+      "default": false,
+      "description": "True jika masih ada stok lama dengan HPP lebih tinggi (perlindungan harga)"
+    },
+    "stock_on_hand": {
+      "type": "number",
+      "default": 0
+    },
+    "min_stock": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "substitution_group": {
+      "type": "string",
+      "description": "Group substitusi: obat dengan zat aktif sama dapat saling menggantikan"
+    },
+    "alternative_active_substances": {
+      "type": "string",
+      "description": "Zat aktif alternatif yang dapat mensubstitusi"
+    },
+    "indication": {
+      "type": "string"
+    },
+    "contraindication": {
+      "type": "string"
+    },
+    "side_effects": {
+      "type": "string"
+    },
+    "interactions": {
+      "type": "string"
+    },
+    "precautions": {
+      "type": "string"
+    },
+    "pregnancy_category": {
+      "type": "string"
+    },
+    "reference_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "selling_price"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

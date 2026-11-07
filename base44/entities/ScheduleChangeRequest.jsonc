@@ -1,0 +1,132 @@
+{
+  "name": "ScheduleChangeRequest",
+  "type": "object",
+  "properties": {
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref DoctorProfile / Staff"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "Tidak Praktik",
+        "Ubah Jadwal",
+        "Tambah Jadwal",
+        "Cuti/Izin"
+      ],
+      "default": "Tidak Praktik"
+    },
+    "affected_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal yang terdampak"
+    },
+    "affected_date_end": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal selesai (untuk cuti multi-hari)"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Alasan pengajuan"
+    },
+    "new_start_time": {
+      "type": "string",
+      "description": "Jam baru (untuk Ubah Jadwal)"
+    },
+    "new_end_time": {
+      "type": "string"
+    },
+    "impacted_appointments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "appointment_id": {
+            "type": "string"
+          },
+          "patient_name": {
+            "type": "string"
+          },
+          "time_slot": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Pasien terdampak yang terdeteksi sistem"
+    },
+    "impacted_count": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Diajukan",
+        "Disetujui",
+        "Ditolak",
+        "Selesai"
+      ],
+      "default": "Diajukan"
+    },
+    "reviewed_by": {
+      "type": "string",
+      "description": "Owner atau Manajer Operasional yang approve/reject"
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "reschedule_action": {
+      "type": "string",
+      "enum": [
+        "Notifikasi Pasien",
+        "Reschedule Otomatis",
+        "Tidak Ada Aksi"
+      ],
+      "default": "Notifikasi Pasien"
+    },
+    "submitted_by": {
+      "type": "string"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "doctor_name",
+    "request_type",
+    "affected_date",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Manajer Operasional"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

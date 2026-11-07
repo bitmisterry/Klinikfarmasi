@@ -1,0 +1,44 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "document_expiry_check",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_documents": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkExpiringDocuments"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Cek Dokumen Berakhir",
+            "description": "Buat notifikasi untuk dokumen yang akan berakhir atau sudah berakhir"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 8 * * 1-6",
+      "one_time_date": null,
+      "timezone": "Asia/Jakarta",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Cek dokumen dengan masa berlaku setiap hari kerja \u2014 buat notifikasi untuk dokumen yang akan berakhir (H-30) atau sudah berakhir",
+  "name": "Document Expiry Check"
+}

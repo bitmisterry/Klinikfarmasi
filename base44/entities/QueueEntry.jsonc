@@ -1,0 +1,137 @@
+{
+  "name": "QueueEntry",
+  "type": "object",
+  "properties": {
+    "queue_number": {
+      "type": "string",
+      "description": "Nomor antrean harian, mis. A-001"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "visit_type": {
+      "type": "string",
+      "enum": [
+        "Poliklinik",
+        "Apotek",
+        "Resep Eksternal"
+      ],
+      "default": "Poliklinik"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Menunggu",
+        "Pemeriksaan",
+        "Selesai Periksa",
+        "Di Apotek",
+        "Kasir",
+        "Selesai",
+        "Batal"
+      ],
+      "default": "Menunggu"
+    },
+    "loket": {
+      "type": "string",
+      "description": "Loket/poli tujuan, mis. Loket Pendaftaran, Poli Umum, Poli Anak"
+    },
+    "priority": {
+      "type": "boolean",
+      "default": false,
+      "description": "True untuk pasien prioritas (lansia, difabel, urgensi)"
+    },
+    "complaint": {
+      "type": "string",
+      "description": "Keluhan utama"
+    },
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref User dokter yang menangani"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "prescription_id": {
+      "type": "string",
+      "description": "Ref Prescription jika sudah dibuat"
+    },
+    "transaction_id": {
+      "type": "string",
+      "description": "Ref Transaction jika sudah dibayar"
+    },
+    "check_in_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "called_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Waktu pasien dipanggil ke loket"
+    },
+    "check_out_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "vital_signs_bp": {
+      "type": "string",
+      "description": "Tekanan darah, mis. 120/80 \u2014 diinput asisten"
+    },
+    "vital_signs_temp": {
+      "type": "number",
+      "description": "Suhu (C) \u2014 diinput asisten"
+    },
+    "vital_signs_pulse": {
+      "type": "number",
+      "description": "Nadi (bpm) \u2014 diinput asisten"
+    },
+    "vital_signs_rr": {
+      "type": "number",
+      "description": "Frekuensi napas \u2014 diinput asisten"
+    },
+    "vital_signs_weight": {
+      "type": "number",
+      "description": "Berat badan (kg) \u2014 diinput asisten"
+    },
+    "vital_signs_height": {
+      "type": "number",
+      "description": "Tinggi badan (cm) \u2014 diinput asisten"
+    },
+    "vital_signs_head_circumference": {
+      "type": "number",
+      "description": "Lingkar kepala (cm) \u2014 diinput asisten"
+    },
+    "vital_signs_recorded_by": {
+      "type": "string",
+      "description": "Nama asisten yang menginput vital sign"
+    },
+    "vital_signs_recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Waktu input vital sign"
+    }
+  },
+  "required": [
+    "patient_id",
+    "patient_name",
+    "visit_type",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

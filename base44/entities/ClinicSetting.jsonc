@@ -1,0 +1,66 @@
+{
+  "name": "ClinicSetting",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Setting key, mis. clinic_name, avg_service_minutes"
+    },
+    "value": {
+      "type": "string",
+      "description": "Setting value (string)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Profil",
+        "Antrean",
+        "Cetak",
+        "Printing",
+        "Notifikasi",
+        "Tampilan",
+        "Data",
+        "Penentuan Harga"
+      ],
+      "default": "Profil"
+    },
+    "label": {
+      "type": "string",
+      "description": "Display label"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "number",
+        "boolean",
+        "textarea",
+        "select"
+      ],
+      "default": "text"
+    }
+  },
+  "required": [
+    "key",
+    "value",
+    "category"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

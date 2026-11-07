@@ -1,0 +1,239 @@
+{
+  "name": "DoctorProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Ref User \u2014 1:1 link"
+    },
+    "staff_id": {
+      "type": "string",
+      "description": "Ref Staff \u2014 sync ke record kepegawaian"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "description": "Gelar, mis. dr., Sp.A, Sp.PD"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Nama tampilan lengkap dengan gelar, mis. dr. Andini Pratama, Sp.A"
+    },
+    "photo_url": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "specialization": {
+      "type": "string",
+      "description": "Spesialisasi, mis. Umum, Anak, Kandungan, Gigi"
+    },
+    "internal_code": {
+      "type": "string",
+      "description": "Nomor internal dokter"
+    },
+    "str_number": {
+      "type": "string",
+      "description": "Surat Tanda Registrasi"
+    },
+    "sip_number": {
+      "type": "string",
+      "description": "Surat Izin Praktik"
+    },
+    "str_expiry": {
+      "type": "string",
+      "format": "date",
+      "description": "Masa berlaku STR"
+    },
+    "sip_expiry": {
+      "type": "string",
+      "format": "date",
+      "description": "Masa berlaku SIP"
+    },
+    "competencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Layanan/kompetensi yang dapat dilakukan"
+    },
+    "practice_days": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Hari praktik: Senin, Selasa, dst."
+    },
+    "default_start_time": {
+      "type": "string",
+      "description": "Jam mulai default, mis. 08:00"
+    },
+    "default_end_time": {
+      "type": "string",
+      "description": "Jam selesai default, mis. 12:00"
+    },
+    "slot_duration": {
+      "type": "number",
+      "default": 15,
+      "description": "Durasi slot per pasien (menit)"
+    },
+    "daily_quota": {
+      "type": "number",
+      "default": 20,
+      "description": "Kuota pasien per hari"
+    },
+    "consultation_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Jenis konsultasi: Konsultasi Umum, Konsultasi Spesialis, Telekonsultasi"
+    },
+    "practice_room": {
+      "type": "string",
+      "description": "Ruang praktik"
+    },
+    "employment_status": {
+      "type": "string",
+      "enum": [
+        "Tetap",
+        "Kontrak",
+        "Kerja Sama",
+        "Part-time",
+        "Guest"
+      ],
+      "default": "Tetap"
+    },
+    "join_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "contract_end": {
+      "type": "string",
+      "format": "date",
+      "description": "Akhir kontrak/kerja sama (kosong jika tetap)"
+    },
+    "remuneration_scheme": {
+      "type": "string",
+      "enum": [
+        "Nominal per Konsultasi",
+        "Persentase",
+        "Per Tindakan",
+        "Kombinasi",
+        "Manual"
+      ],
+      "default": "Nominal per Konsultasi"
+    },
+    "remuneration_nominal": {
+      "type": "number",
+      "default": 0,
+      "description": "Nominal per konsultasi (jika scheme = Nominal)"
+    },
+    "remuneration_percent": {
+      "type": "number",
+      "default": 0,
+      "description": "Persentase dari tindakan/konsultasi (jika scheme = Persentase)"
+    },
+    "remuneration_per_tindakan": {
+      "type": "number",
+      "default": 0,
+      "description": "Nominal per tindakan (jika scheme = Per Tindakan)"
+    },
+    "management_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Peran manajemen tambahan, mis. Medical Director, PIC Klinik. Memungkinkan Switch Workspace di Doctor Portal."
+    },
+    "exam_template_config": {
+      "type": "object",
+      "description": "Konfigurasi template pemeriksaan per spesialisasi",
+      "properties": {
+        "visible_vital_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Field vital yang ditampilkan: bp, temp, pulse, rr, weight, height, head_circumference, bmi"
+        },
+        "show_growth_prompt": {
+          "type": "boolean",
+          "default": false
+        },
+        "show_immunization_prompt": {
+          "type": "boolean",
+          "default": false
+        },
+        "show_odontogram_link": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "full_name",
+    "specialization",
+    "is_active"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

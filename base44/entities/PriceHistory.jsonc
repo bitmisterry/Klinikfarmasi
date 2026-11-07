@@ -1,0 +1,91 @@
+{
+  "name": "PriceHistory",
+  "type": "object",
+  "properties": {
+    "medicine_id": {
+      "type": "string",
+      "description": "Ref Medicine"
+    },
+    "medicine_name": {
+      "type": "string"
+    },
+    "old_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Harga jual sebelum perubahan"
+    },
+    "new_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Harga jual setelah perubahan"
+    },
+    "min_safe_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Harga Minimum Aman yang berlaku saat perubahan"
+    },
+    "hpp_basis": {
+      "type": "number",
+      "default": 0,
+      "description": "HPP yang dipakai sebagai dasar (per-batch tertinggi aktif)"
+    },
+    "target_margin": {
+      "type": "number",
+      "default": 0,
+      "description": "Target margin (%) saat perubahan"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Alasan perubahan (wajib jika harga di bawah batas minimum)"
+    },
+    "changed_by_name": {
+      "type": "string"
+    },
+    "changed_by_id": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "faktur",
+        "manual",
+        "override"
+      ],
+      "default": "manual",
+      "description": "Sumber perubahan: faktur (dari input faktur), manual (di master obat), override (di bawah batas minimum)"
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "Ref SupplierInvoice jika source=faktur"
+    },
+    "below_minimum": {
+      "type": "boolean",
+      "default": false,
+      "description": "True jika harga baru di bawah Harga Minimum Aman"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "medicine_id",
+    "medicine_name",
+    "new_price",
+    "source"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

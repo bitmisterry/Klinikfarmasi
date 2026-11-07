@@ -1,0 +1,94 @@
+{
+  "name": "Role",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama role, mis. Owner, Apoteker, atau role custom"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false,
+      "description": "True untuk 8 role bawaan sistem"
+    },
+    "is_system": {
+      "type": "boolean",
+      "default": false,
+      "description": "True untuk role bawaan yang tidak dapat dihapus (Owner, Admin)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Map module_key -> {view, create, edit, delete, approve} boolean",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "boolean"
+          },
+          "create": {
+            "type": "boolean"
+          },
+          "edit": {
+            "type": "boolean"
+          },
+          "delete": {
+            "type": "boolean"
+          },
+          "approve": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "advanced_permissions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "void_transaction, refund, price_override, stock_adjustment, view_hpp, view_rme, edit_prescription, approve_purchase, post_payment, manage_users_roles"
+    },
+    "user_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User IDs assigned to this role"
+    },
+    "color": {
+      "type": "string",
+      "description": "Badge color token: teal, blue, purple, amber, rose, emerald, slate"
+    },
+    "created_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "is_active"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

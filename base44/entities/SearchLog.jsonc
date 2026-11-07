@@ -1,0 +1,87 @@
+{
+  "name": "SearchLog",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "Teks pencarian pengguna"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "current_route": {
+      "type": "string",
+      "description": "Halaman aktif saat mencari"
+    },
+    "found": {
+      "type": "boolean",
+      "description": "True jika ada hasil, false jika tidak"
+    },
+    "result_type": {
+      "type": "string",
+      "description": "Jenis hasil yang diklik: guide, data, llm, none"
+    },
+    "result_title": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "synonym",
+        "guide",
+        "llm",
+        "not_found"
+      ],
+      "default": "synonym"
+    },
+    "searched_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "query",
+    "found"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

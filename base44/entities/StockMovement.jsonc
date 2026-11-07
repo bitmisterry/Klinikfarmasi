@@ -1,0 +1,98 @@
+{
+  "name": "StockMovement",
+  "type": "object",
+  "properties": {
+    "medicine_id": {
+      "type": "string"
+    },
+    "medicine_name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Masuk",
+        "Keluar",
+        "Adjustment",
+        "Opname",
+        "Retur"
+      ]
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Jumlah mutasi: positif untuk masuk, negatif untuk keluar"
+    },
+    "balance_after": {
+      "type": "number"
+    },
+    "batch_number": {
+      "type": "string"
+    },
+    "reference_type": {
+      "type": "string",
+      "enum": [
+        "PurchaseOrder",
+        "Transaction",
+        "Adjustment",
+        "Opname",
+        "Retur",
+        "Initial"
+      ]
+    },
+    "reference_id": {
+      "type": "string"
+    },
+    "reference_number": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "medicine_id",
+    "medicine_name",
+    "type",
+    "quantity",
+    "timestamp"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

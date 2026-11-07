@@ -1,0 +1,122 @@
+{
+  "name": "StockBatch",
+  "type": "object",
+  "properties": {
+    "medicine_id": {
+      "type": "string"
+    },
+    "medicine_name": {
+      "type": "string"
+    },
+    "batch_number": {
+      "type": "string",
+      "description": "Nomor batch produksi"
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Jumlah stok tersisa di batch ini"
+    },
+    "initial_quantity": {
+      "type": "number",
+      "description": "Jumlah awal saat diterima"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal kadaluarsa (FEFO)"
+    },
+    "received_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "purchase_price": {
+      "type": "number",
+      "description": "Harga beli per unit net sebelum PPN (untuk histori faktur)"
+    },
+    "selling_price": {
+      "type": "number",
+      "description": "HNA (Harga Netto Apotek) saat batch dibuat"
+    },
+    "hpp_per_unit": {
+      "type": "number",
+      "default": 0,
+      "description": "HPP final per unit = harga net + PPN share + penyesuaian bonus. Dipakai untuk perhitungan Harga Minimum Aman."
+    },
+    "is_bonus": {
+      "type": "boolean",
+      "default": false,
+      "description": "True jika batch ini murni bonus (gratis)"
+    },
+    "source_invoice_id": {
+      "type": "string",
+      "description": "Ref SupplierInvoice yang membuat/memperbarui batch ini"
+    },
+    "invoice_id": {
+      "type": "string",
+      "description": "Ref SupplierInvoice (alias, kompatibilitas)"
+    },
+    "invoice_number": {
+      "type": "string",
+      "description": "Nomor faktur supplier untuk traceability"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Aktif",
+        "Habis",
+        "Kadaluarsa",
+        "Retur"
+      ],
+      "default": "Aktif"
+    }
+  },
+  "required": [
+    "medicine_id",
+    "medicine_name",
+    "batch_number",
+    "quantity",
+    "expiry_date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

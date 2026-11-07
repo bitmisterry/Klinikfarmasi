@@ -1,0 +1,151 @@
+{
+  "name": "ImmunizationRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "vaccine_type": {
+      "type": "string",
+      "description": "Jenis vaksin, mis. BCG, Polio, DPT-HB, MR, Hep B"
+    },
+    "vaccine_label": {
+      "type": "string",
+      "description": "Label lengkap, mis. BCG 1, Polio 2"
+    },
+    "dose_number": {
+      "type": "number",
+      "default": 1,
+      "description": "Dosis ke berapa"
+    },
+    "administered_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal pemberian"
+    },
+    "age_at_administration": {
+      "type": "string",
+      "description": "Usia saat diberikan, mis. 2 bulan"
+    },
+    "doctor_id": {
+      "type": "string"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "batch_number": {
+      "type": "string",
+      "description": "Nomor batch vaksin"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "site": {
+      "type": "string",
+      "enum": [
+        "Lengan Kanan",
+        "Lengan Kiri",
+        "Paha Kanan",
+        "Paha Kiri",
+        "Oral",
+        "Lainnya"
+      ],
+      "description": "Lokasi injeksi"
+    },
+    "next_due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Jadwal imunisasi berikutnya"
+    },
+    "next_vaccine_type": {
+      "type": "string",
+      "description": "Vaksin berikutnya yang dijadwalkan"
+    },
+    "next_vaccine_label": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Terkonfirmasi",
+        "Dijadwalkan",
+        "Terlewat",
+        "Dibatalkan"
+      ],
+      "default": "Terkonfirmasi"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "vaccine_type",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Anak"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Perawat"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Front Office"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Anak"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Front Office"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

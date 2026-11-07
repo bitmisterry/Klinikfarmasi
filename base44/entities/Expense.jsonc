@@ -1,0 +1,88 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "expense_number": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Pembelian Obat",
+        "Gaji",
+        "Operasional",
+        "Utilitas",
+        "Maintenance",
+        "Lainnya"
+      ],
+      "default": "Operasional"
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tunai",
+        "Transfer",
+        "Debit"
+      ],
+      "default": "Tunai"
+    },
+    "payee": {
+      "type": "string",
+      "description": "Penerima pihak pembayaran"
+    },
+    "expense_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "created_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "category",
+    "amount",
+    "expense_date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

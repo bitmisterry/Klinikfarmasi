@@ -1,0 +1,191 @@
+{
+  "name": "RacikanTemplate",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "racikan_name": {
+      "type": "string"
+    },
+    "bentuk_racikan": {
+      "type": "string",
+      "enum": [
+        "Puyer",
+        "Kapsul",
+        "Cair",
+        "Krim",
+        "Lainnya"
+      ],
+      "default": "Puyer"
+    },
+    "jumlah_resep": {
+      "type": "number"
+    },
+    "jumlah_ambil": {
+      "type": "number"
+    },
+    "signa": {
+      "type": "string"
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "active_substance": {
+            "type": "string"
+          },
+          "kekuatan": {
+            "type": "string"
+          },
+          "dosis_per_racikan": {
+            "type": "number"
+          },
+          "dosis_mode": {
+            "type": "string",
+            "enum": [
+              "mg",
+              "pecahan"
+            ]
+          },
+          "dosis_label": {
+            "type": "string"
+          },
+          "kebutuhan_teoritis": {
+            "type": "number"
+          },
+          "kebutuhan_ambil": {
+            "type": "number"
+          },
+          "pembulatan_rule": {
+            "type": "string",
+            "enum": [
+              "ceil",
+              "floor",
+              "round",
+              "precision1"
+            ]
+          },
+          "harga_unit": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "kemasan_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "jasa_racik_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    },
+    "storage_instructions": {
+      "type": "string",
+      "description": "Instruksi penyimpanan untuk etiket racikan (kocok dahulu, simpan di lemari es, dll). Kosong = tidak tampil di etiket."
+    },
+    "source_prescription_id": {
+      "type": "string"
+    },
+    "prescription_id": {
+      "type": "string"
+    },
+    "workflow_status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Review Farmasi",
+        "Siap Diracik",
+        "Diracik",
+        "Siap Diserahkan",
+        "Selesai"
+      ],
+      "default": "Draft"
+    },
+    "verified_by": {
+      "type": "string"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "label_printed": {
+      "type": "boolean",
+      "default": false
+    },
+    "adjustment_log": {
+      "type": "string"
+    },
+    "is_master_template": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "racikan_name",
+    "bentuk_racikan",
+    "workflow_status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Asisten Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

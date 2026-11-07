@@ -1,0 +1,87 @@
+{
+  "name": "Schedule",
+  "type": "object",
+  "properties": {
+    "staff_id": {
+      "type": "string",
+      "description": "Ref Staff"
+    },
+    "staff_name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "Dokter",
+        "Apoteker",
+        "Kasir",
+        "Perawat",
+        "Admin",
+        "Owner",
+        "Staff"
+      ],
+      "description": "Role denormalized dari Staff"
+    },
+    "shift_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal shift"
+    },
+    "shift": {
+      "type": "string",
+      "enum": [
+        "Pagi",
+        "Siang",
+        "Malam",
+        "Lengkap"
+      ],
+      "default": "Pagi"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Jam mulai, mis. 08:00"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Jam selesai, mis. 16:00"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Dijadwalkan",
+        "Hadir",
+        "Izin",
+        "Sakit",
+        "Alpa"
+      ],
+      "default": "Dijadwalkan"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "staff_name",
+    "shift_date",
+    "shift",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

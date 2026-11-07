@@ -1,0 +1,260 @@
+{
+  "name": "SupplierInvoice",
+  "type": "object",
+  "properties": {
+    "invoice_number": {
+      "type": "string",
+      "description": "Nomor faktur supplier, mis. FK-2026-001"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "po_id": {
+      "type": "string",
+      "description": "Ref PurchaseOrder"
+    },
+    "po_number": {
+      "type": "string"
+    },
+    "invoice_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal jatuh tempo"
+    },
+    "subtotal": {
+      "type": "number",
+      "default": 0,
+      "description": "Total harga kotor (sebelum diskon) semua item"
+    },
+    "total_discount": {
+      "type": "number",
+      "default": 0,
+      "description": "Total diskon semua item"
+    },
+    "tax_ppn": {
+      "type": "number",
+      "default": 0,
+      "description": "Total PPN dalam Rupiah (sum PPN per item)"
+    },
+    "other_charges": {
+      "type": "number",
+      "default": 0,
+      "description": "Biaya lain (ongkir, dll)"
+    },
+    "total_amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Total faktur = subtotal - total_discount + tax_ppn + other_charges"
+    },
+    "paid_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Belum Bayar",
+        "Sebagian Bayar",
+        "Lunas",
+        "Overdue",
+        "Batal"
+      ],
+      "default": "Belum Bayar"
+    },
+    "kontrabon_status": {
+      "type": "string",
+      "enum": [
+        "Belum Jatuh Tempo",
+        "Mendekati Jatuh Tempo",
+        "Kontrabon",
+        "Selesai"
+      ],
+      "default": "Belum Jatuh Tempo",
+      "description": "Status kontrabon: Belum Jatuh Tempo, Mendekati (H-7), Kontrabon (jatuh tempo), Selesai (lunas)"
+    },
+    "days_until_due": {
+      "type": "number",
+      "description": "Hari hingga jatuh tempo (auto-calc, negatif jika lewat)"
+    },
+    "bonus_treatment": {
+      "type": "string",
+      "enum": [
+        "Gratis",
+        "Prorata"
+      ],
+      "default": "Gratis",
+      "description": "Perlakuan bonus untuk perhitungan HPP: Gratis (HPP = net/qty berbayar) atau Prorata (HPP = net/(qty+bonus))"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Jumlah unit dibeli (berbayar)"
+          },
+          "bonus_quantity": {
+            "type": "number",
+            "default": 0,
+            "description": "Jumlah unit bonus (gratis)"
+          },
+          "total_received": {
+            "type": "number",
+            "default": 0,
+            "description": "Total diterima = quantity + bonus_quantity"
+          },
+          "batch_number": {
+            "type": "string",
+            "description": "Nomor batch produksi"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Tanggal kadaluarsa batch"
+          },
+          "unit_price": {
+            "type": "number",
+            "description": "Harga satuan sebelum diskon"
+          },
+          "discount_type": {
+            "type": "string",
+            "enum": [
+              "Tidak Ada",
+              "Persen",
+              "Nominal"
+            ],
+            "default": "Tidak Ada"
+          },
+          "discount_value": {
+            "type": "number",
+            "default": 0,
+            "description": "Nilai diskon: persentase (%) atau nominal (Rp)"
+          },
+          "discount_amount": {
+            "type": "number",
+            "default": 0,
+            "description": "Rupiah diskon per unit (auto-calc)"
+          },
+          "net_unit_price": {
+            "type": "number",
+            "default": 0,
+            "description": "Harga satuan setelah diskon (sebelum PPN)"
+          },
+          "ppn_percent": {
+            "type": "number",
+            "default": 0,
+            "description": "Persentase PPN per item"
+          },
+          "ppn_amount": {
+            "type": "number",
+            "default": 0,
+            "description": "Rupiah PPN untuk item ini (auto-calc)"
+          },
+          "hpp_per_unit": {
+            "type": "number",
+            "default": 0,
+            "description": "HPP final per unit setelah diskon + PPN + perlakuan bonus"
+          },
+          "target_margin": {
+            "type": "number",
+            "default": 0,
+            "description": "Target margin (%) untuk item ini"
+          },
+          "min_safe_price": {
+            "type": "number",
+            "default": 0,
+            "description": "Harga Minimum Aman terhitung (dengan perlindungan stok lama)"
+          },
+          "hna_baru": {
+            "type": "number",
+            "default": 0,
+            "description": "HNA / Harga Jual baru \u2014 harga jual terupdate dari faktur ini"
+          },
+          "hna_auto": {
+            "type": "boolean",
+            "default": true,
+            "description": "True jika HNA dihitung otomatis, false jika user menyesuaikan"
+          },
+          "line_total": {
+            "type": "number",
+            "default": 0,
+            "description": "Total baris = net_unit_price \u00d7 qty + ppn_amount"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "invoice_number",
+    "supplier_name",
+    "invoice_date",
+    "total_amount",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Finance"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Finance"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

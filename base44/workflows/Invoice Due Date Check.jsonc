@@ -1,0 +1,44 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "invoice_due_date_check",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_invoices": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkInvoiceDueDates"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Cek Jatuh Tempo Faktur",
+            "description": "Update kontrabon status & buat notifikasi H-7/overdue"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 8 * * 1-6",
+      "one_time_date": null,
+      "timezone": "Asia/Jakarta",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Cek jatuh tempo faktur supplier setiap hari kerja \u2014 update kontrabon_status, buat notifikasi H-7 & overdue untuk apoteker/finance",
+  "name": "Invoice Due Date Check"
+}

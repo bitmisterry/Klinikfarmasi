@@ -1,0 +1,164 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "owner_type": {
+      "type": "string",
+      "enum": [
+        "Dokter",
+        "Staf",
+        "Pasien",
+        "Kunjungan",
+        "Rekam Medis",
+        "Resep",
+        "Obat",
+        "Pembelian",
+        "Faktur",
+        "Pembayaran Supplier",
+        "Supplier",
+        "Barang Rusak",
+        "Retur",
+        "Stok",
+        "Keuangan",
+        "Peralatan",
+        "SOP",
+        "Klinik",
+        "Konsultasi Online"
+      ],
+      "description": "Jenis data pemilik dokumen"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "ID record pemilik"
+    },
+    "owner_name": {
+      "type": "string",
+      "description": "Nama tampil pemilik (denormalized)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nama dokumen/lampiran"
+    },
+    "category": {
+      "type": "string",
+      "description": "Kategori dokumen, mis. CV, STR, SIP, Kontrak, Faktur Asli, Surat Jalan, Garansi, Manual"
+    },
+    "description": {
+      "type": "string",
+      "description": "Keterangan tambahan"
+    },
+    "attachment_type": {
+      "type": "string",
+      "enum": [
+        "file",
+        "photo",
+        "link"
+      ],
+      "default": "file",
+      "description": "Jenis lampiran: file unggahan, foto, atau link eksternal"
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "URI file privat (UploadPrivateFile) \u2014 akses via signed URL"
+    },
+    "file_ext": {
+      "type": "string",
+      "description": "Ekstensi file: pdf, jpg, png, docx, xlsx, dll"
+    },
+    "file_size": {
+      "type": "number",
+      "description": "Ukuran file dalam bytes"
+    },
+    "external_url": {
+      "type": "string",
+      "description": "URL link eksternal (Google Drive, OneDrive, dll)"
+    },
+    "document_number": {
+      "type": "string",
+      "description": "Nomor dokumen, mis. nomor STR/SIP/kontrak"
+    },
+    "issued_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal terbit dokumen"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal berlaku sampai (untuk dokumen dengan masa berlaku)"
+    },
+    "reminder_days": {
+      "type": "number",
+      "default": 30,
+      "description": "Pengingat H-N hari sebelum berakhir"
+    },
+    "added_by_name": {
+      "type": "string",
+      "description": "Nama pengguna yang menambahkan"
+    },
+    "added_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Waktu dokumen ditambahkan"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "owner_type",
+    "owner_id",
+    "name",
+    "attachment_type",
+    "is_active"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

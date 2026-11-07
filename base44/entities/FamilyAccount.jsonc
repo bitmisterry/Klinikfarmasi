@@ -1,0 +1,32 @@
+{
+  "name": "FamilyAccount",
+  "type": "object",
+  "properties": {
+    "family_name": {
+      "type": "string",
+      "description": "Nama keluarga, mis. Keluarga Budi Hartono"
+    },
+    "parent_user_id": {
+      "type": "string",
+      "description": "Ref User orang tua/wali"
+    },
+    "parent_name": {
+      "type": "string"
+    },
+    "parent_phone": {
+      "type": "string"
+    },
+    "parent_email": {
+      "type": "string"
+    },
+    "parent_relation": {
+      "type": "string",
+      "enum": [
+        "Ayah",
+        "Ibu",
+        "Wali",
+        "Kakek",
+        "Nenek",
+        "Lainnya"
+      ],
+      "default": "Ibu"

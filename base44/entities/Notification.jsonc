@@ -1,0 +1,102 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "target_user_id": {
+      "type": "string"
+    },
+    "target_role": {
+      "type": "string"
+    },
+    "target_division": {
+      "type": "string",
+      "description": "Divisi tujuan: Front Office, Asisten, Farmasi, Kasir, Semua"
+    },
+    "from_user_id": {
+      "type": "string"
+    },
+    "from_user_name": {
+      "type": "string"
+    },
+    "from_role": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Penting",
+        "Mendesak"
+      ],
+      "default": "Normal"
+    },
+    "related_entity": {
+      "type": "string"
+    },
+    "related_id": {
+      "type": "string"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Baru",
+        "Dibaca",
+        "Ditanggapi",
+        "Selesai"
+      ],
+      "default": "Baru"
+    },
+    "reply": {
+      "type": "string",
+      "description": "Tanggapan dari penerima"
+    },
+    "replied_by": {
+      "type": "string"
+    },
+    "replied_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "parent_notification_id": {
+      "type": "string",
+      "description": "Ref notifikasi induk jika ini balasan"
+    },
+    "action_label": {
+      "type": "string"
+    },
+    "action_type": {
+      "type": "string"
+    },
+    "action_payload": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "title",
+    "target_role"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

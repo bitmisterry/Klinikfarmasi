@@ -1,0 +1,83 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "Jenis aksi: create/update/delete/void/refund/price_change/stock_adjust/login/logout/role_change/permission_change/payment/kontrabon"
+    },
+    "entity": {
+      "type": "string",
+      "description": "Entitas yang terpengaruh: Patient, MedicalRecord, Prescription, Medicine, Transaction, Role, etc."
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "entity_name": {
+      "type": "string",
+      "description": "Nama obat/pasien/faktur untuk identifikasi cepat"
+    },
+    "module": {
+      "type": "string",
+      "description": "Modul: patients, rme, prescription, inventory, purchasing, finance, user_role, etc."
+    },
+    "description": {
+      "type": "string",
+      "description": "Deskripsi aksi yang dilakukan"
+    },
+    "old_value": {
+      "type": "string",
+      "description": "Nilai sebelum perubahan"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "Nilai sesudah perubahan"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Alasan perubahan (untuk stock adjustment, void, refund, dll.)"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "user_role": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Info",
+        "Warning",
+        "Critical"
+      ],
+      "default": "Info"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "action",
+    "entity",
+    "user_name",
+    "timestamp"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

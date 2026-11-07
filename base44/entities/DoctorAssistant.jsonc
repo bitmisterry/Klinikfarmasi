@@ -1,0 +1,32 @@
+{
+  "name": "DoctorAssistant",
+  "type": "object",
+  "properties": {
+    "assistant_email": {
+      "type": "string",
+      "description": "Email akun asisten \u2014 untuk matching saat login"
+    },
+    "assistant_name": {
+      "type": "string",
+      "description": "Nama asisten dokter"
+    },
+    "assistant_user_id": {
+      "type": "string",
+      "description": "User ID asisten (di-set otomatis setelah login pertama)"
+    },
+    "doctor_user_id": {
+      "type": "string",
+      "description": "User ID dokter yang di-link"
+    },
+    "doctor_profile_id": {
+      "type": "string",
+      "description": "Ref DoctorProfile dokter yang di-link"
+    },
+    "doctor_name": {
+      "type": "string",
+      "description": "Nama tampilan dokter (denormalized untuk badge header)"
+    },
+    "doctor_specialization": {
+      "type": "string"
+    },
+    "is_active": {

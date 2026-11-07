@@ -1,0 +1,66 @@
+{
+  "name": "RacikanConfig",
+  "type": "object",
+  "properties": {
+    "bentuk_racikan": {
+      "type": "string",
+      "enum": [
+        "Puyer",
+        "Kapsul",
+        "Cair",
+        "Krim",
+        "Lainnya"
+      ]
+    },
+    "pembulatan_rule": {
+      "type": "string",
+      "enum": [
+        "ceil",
+        "floor",
+        "round",
+        "precision1"
+      ],
+      "default": "ceil"
+    },
+    "default_kemasan_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "default_jasa_racik_fee": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "label_template": {
+      "type": "string"
+    },
+    "facility_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "bentuk_racikan",
+    "pembulatan_rule"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

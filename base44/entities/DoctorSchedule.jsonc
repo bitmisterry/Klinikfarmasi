@@ -1,0 +1,138 @@
+{
+  "name": "DoctorSchedule",
+  "type": "object",
+  "properties": {
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref Staff/DoctorProfile dokter"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "day_of_week": {
+      "type": "string",
+      "enum": [
+        "Senin",
+        "Selasa",
+        "Rabu",
+        "Kamis",
+        "Jumat",
+        "Sabtu",
+        "Minggu"
+      ]
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Jam mulai, mis. 08:00"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Jam selesai, mis. 12:00"
+    },
+    "poli": {
+      "type": "string",
+      "description": "Poli tujuan, mis. Poli Umum, Poli Anak"
+    },
+    "slot_duration": {
+      "type": "number",
+      "default": 15,
+      "description": "Durasi slot per pasien (menit)"
+    },
+    "daily_quota": {
+      "type": "number",
+      "default": 20,
+      "description": "Kuota pasien per sesi"
+    },
+    "practice_room": {
+      "type": "string",
+      "description": "Ruang praktik"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date"
+    },
+    "effective_until": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Dijadwalkan",
+        "Hadir",
+        "Tidak Praktik",
+        "Cuti",
+        "Izin",
+        "Sakit",
+        "Alpa"
+      ],
+      "default": "Dijadwalkan"
+    }
+  },
+  "required": [
+    "doctor_name",
+    "day_of_week",
+    "start_time",
+    "end_time"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

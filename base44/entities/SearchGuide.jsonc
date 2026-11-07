@@ -1,0 +1,32 @@
+{
+  "name": "SearchGuide",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Judul panduan/hasil, mis. 'Tambah Pasien Baru'"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Menu & Fitur",
+        "Cara Melakukan",
+        "Pertanyaan"
+      ],
+      "default": "Menu & Fitur",
+      "description": "Jenis hasil: Menu & Fitur, Cara Melakukan, atau Pertanyaan"
+    },
+    "keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Kata pencarian & sinonim yang cocok dengan panduan ini"
+    },
+    "description": {
+      "type": "string",
+      "description": "Penjelasan singkat (1-2 kalimat)"
+    },
+    "steps": {
+      "type": "array",
+      "items": {

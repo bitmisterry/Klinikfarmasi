@@ -1,0 +1,103 @@
+{
+  "name": "InternalRequest",
+  "type": "object",
+  "properties": {
+    "request_number": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Permintaan Obat",
+        "Pertanyaan Stok",
+        "Permintaan Pengadaan",
+        "Feedback Resep",
+        "Lainnya"
+      ],
+      "default": "Permintaan Obat"
+    },
+    "from_user_id": {
+      "type": "string"
+    },
+    "from_user_name": {
+      "type": "string"
+    },
+    "from_role": {
+      "type": "string"
+    },
+    "to_role": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "medicine_id": {
+      "type": "string"
+    },
+    "medicine_name": {
+      "type": "string"
+    },
+    "prescription_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Baru",
+        "Dilihat",
+        "Diproses",
+        "Selesai",
+        "Ditolak"
+      ],
+      "default": "Baru"
+    },
+    "response": {
+      "type": "string"
+    },
+    "created_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Penting",
+        "Mendesak"
+      ],
+      "default": "Normal"
+    }
+  },
+  "required": [
+    "type",
+    "from_user_name",
+    "subject",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

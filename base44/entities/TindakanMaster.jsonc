@@ -1,0 +1,107 @@
+{
+  "name": "TindakanMaster",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Kode tindakan, mis. TND-001"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nama tindakan/layanan"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Konsultasi",
+        "Tindakan Medis",
+        "Prosedur",
+        "Laboratorium",
+        "Diagnostik",
+        "Lainnya"
+      ],
+      "default": "Tindakan Medis"
+    },
+    "fee": {
+      "type": "number",
+      "default": 0,
+      "description": "Tarif standar"
+    },
+    "consumables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Bahan/alkes yang dipakai otomatis dikurangi dari stok"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "fee",
+    "category"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

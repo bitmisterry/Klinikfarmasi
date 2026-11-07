@@ -1,0 +1,75 @@
+{
+  "name": "Staff",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "Dokter",
+        "Apoteker",
+        "Kasir",
+        "Perawat",
+        "Admin",
+        "Owner",
+        "Staff"
+      ],
+      "default": "Staff"
+    },
+    "license_number": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "shift": {
+      "type": "string",
+      "enum": [
+        "Pagi",
+        "Siang",
+        "Malam",
+        "Lengkap"
+      ],
+      "default": "Pagi"
+    },
+    "hire_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "salary": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "full_name",
+    "role"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

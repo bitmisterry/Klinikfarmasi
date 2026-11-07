@@ -1,0 +1,96 @@
+{
+  "name": "CashSession",
+  "type": "object",
+  "properties": {
+    "session_number": {
+      "type": "string"
+    },
+    "opened_by": {
+      "type": "string"
+    },
+    "opened_by_name": {
+      "type": "string"
+    },
+    "opened_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "closed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "opening_cash": {
+      "type": "number",
+      "default": 0
+    },
+    "closing_cash": {
+      "type": "number",
+      "default": 0
+    },
+    "expected_cash": {
+      "type": "number",
+      "default": 0
+    },
+    "difference": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Aktif",
+        "Tutup"
+      ],
+      "default": "Aktif"
+    },
+    "total_transactions": {
+      "type": "number",
+      "default": 0
+    },
+    "total_cash_sales": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "opened_by",
+    "opened_by_name",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

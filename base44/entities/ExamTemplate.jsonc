@@ -1,0 +1,113 @@
+{
+  "name": "ExamTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama template pemeriksaan, mis. ISPA Anak, Hipertensi Dewasa"
+    },
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref User dokter pemilik template"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "diagnosis_tag": {
+      "type": "string",
+      "description": "Tag diagnosis terkait, mis. Common cold, Hipertensi"
+    },
+    "chief_complaint": {
+      "type": "string",
+      "description": "Keluhan utama default"
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Diagnosis narasi"
+    },
+    "diagnosis_code": {
+      "type": "string",
+      "description": "Kode ICD-10"
+    },
+    "procedures": {
+      "type": "array",
+      "description": "Tindakan standar untuk template ini",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "fee": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "treatment_plan": {
+      "type": "string",
+      "description": "Rencana terapi default"
+    },
+    "follow_up_instructions": {
+      "type": "string"
+    },
+    "patient_education": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

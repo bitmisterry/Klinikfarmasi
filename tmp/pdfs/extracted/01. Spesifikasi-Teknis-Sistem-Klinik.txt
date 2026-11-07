@@ -1,0 +1,4008 @@
+
+===== PAGE 1 =====
+Spesifikasi Kebutuhan & Rancangan
+Fungsional
+Sistem Manajemen Klinik & Instalasi Farmasi
+Klinik Anak, Keluarga & Gigi
+Dokumen serah-terima untuk Software Engineer, Tim IT, dan Software Builder
+Versi
+1.1 (draft untuk review teknis)
+Tanggal
+15 Oktober 2026
+Pemilik kebutuhan
+Pemilik klinik
+Bahasa
+Indonesia. Istilah kefarmasian dan klinis dipertahankan (lihat Glosarium, Bagian 23).
+Status keputusan
+Poin bertanda KETENTUAN FINAL sudah diputuskan pemilik. Poin bertanda ASUMSI adalah
+rekomendasi yang harus dikonfirmasi sebelum dibangun.
+Perubahan v1.1
+Menambahkan sub-bagian 12.12-12.17 pada Modul Farmasi: vaksin/cold chain, BUD racikan,
+pemusnahan obat, penjualan bebas (OTC), multi-supplier, metode costing.
+
+===== PAGE 2 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 2
+Daftar Isi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 2
+Daftar Isi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+1. Cara Membaca Dokumen Ini
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 5
+1.1 Di dalam dan di luar cakupan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 6
+2. Latar Belakang dan Tujuan Bisnis
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 6
+3. Kerangka Berpikir dan Prinsip Desain
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 8
+4. Aktor dan Role
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 8
+5. Arsitektur Konseptual dan Model Data
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 8
+5.1 Enam domain fungsional
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 9
+5.2 Persyaratan integritas teknis
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 9
+5.3 Peristiwa domain (domain events)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 9
+5.4 Entitas inti dan field kunci
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 11
+5.5 Mesin status (state machine)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 12
+6. Model Izin (RBAC) dan Matriks Akses
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 13
+7. Alur End-to-End Pasien
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 14
+8. Modul Front Desk dan Antrian
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 15
+9. Modul Perawat / Asisten Medis (Intake)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 16
+10. Modul Dokter (Umum dan Spesialis Anak)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 16
+10.1 Terima pasien dan workspace klinis
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 16
+10.2 Tindakan sebagai Order dengan tujuan divisi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 17
+10.3 Lembar resep kosong (Prescription Pad)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 17
+10.4 Alur pembacaan (parsing) teks bebas
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 18
+10.5 Iterasi resep
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 18
+10.6 Peringatan alergi dan ketersediaan stok saat meresepkan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 18
+10.7 Dokumen resep resmi dan otentikasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 19
+10.8 Pengembalian dari farmasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 19
+10.9 Tabel kebutuhan modul dokter
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 20
+11. Kekhususan Dokter Gigi dan Dokter Anak
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 20
+11.1 Dokter gigi: odontogram dan rencana perawatan multi-sesi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 21
+11.2 Dokter anak: tumbuh kembang dan imunisasi
+
+===== PAGE 3 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 3
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 22
+12. Modul Farmasi (Instalasi Farmasi / Apotek)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 22
+12.1 Master data obat
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 22
+12.2 Pengadaan: defecta dan Surat Pesanan (SP)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 22
+12.3 Penerimaan faktur dan kartu stok
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 23
+12.4 Harga jual, diskon, dan komponen biaya
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 24
+12.5 Pelayanan resep
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 25
+12.6 Konversi dosis otomatis dan flag pecahan ganjil
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 25
+12.7 Narkotika dan psikotropika, pelaporan SIPNAP
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 26
+12.8 Pengarsipan dan retensi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 26
+12.9 Pencetakan etiket
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 27
+12.10 Notifikasi jatuh tempo faktur dan kontrabon
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 27
+12.11 Daftar ceklis pekerjaan farmasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 28
+12.12 Vaksin dan Cold Chain
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 29
+12.13 Beyond-Use Date (BUD) untuk Racikan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 30
+12.14 Pemusnahan Obat Rusak/Kedaluwarsa
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 31
+12.15 Penjualan Bebas (OTC) Tanpa Resep/Kunjungan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 32
+12.16 Manajemen Multi-Supplier dan Perbandingan Harga
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 32
+12.17 Metode Costing (Harga Pokok Stok Keluar)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 34
+13. Modul Kasir (Klinik dan Farmasi)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 34
+13.1 Dua titik kasir
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 34
+13.2 Alur shift
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 34
+13.3 Transaksi: harga, diskon, komponen
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 34
+13.4 Void, pembatalan, refund
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 35
+13.5 Metode pembayaran dan rekonsiliasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 36
+14. Modul Manajer Operasional dan Owner
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 36
+14.1 Dashboard
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 36
+14.2 Maintenance alat
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 37
+14.3 SDM dan shift
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 37
+15. Komunikasi Internal: Memo dan Pengumuman
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 37
+15.1 Memo terarah (point-to-point)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 37
+15.2 Pengumuman umum (broadcast)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 38
+16. Audit, Keamanan, dan Kepatuhan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 38
+16.1 Audit trail
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 38
+16.2 Keamanan dan privasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 38
+16.3 Kepatuhan regulasi (harus diverifikasi sebelum go-live)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 39
+17. Integrasi dan Perangkat
+
+===== PAGE 4 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 4
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 40
+18. Kebutuhan Non-Fungsional
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 41
+19. Katalog Aturan Kontrol dan Deteksi Anomali
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 42
+20. Skenario Penerimaan (Acceptance Criteria)
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 44
+21. Register Keputusan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 44
+21.1 Keputusan final pemilik
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 45
+21.2 Asumsi yang perlu dikonfirmasi
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 46
+21.3 Pertanyaan terbuka
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 46
+22. Fase Implementasi yang Diusulkan
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  . 47
+23. Glosarium
+
+===== PAGE 5 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 5
+1. Cara Membaca Dokumen Ini
+Dokumen ini ditulis agar engineer dapat membangun sistem yang dimaksud pemilik tanpa harus menebak.
+Setiap modul dijelaskan dalam tiga lapis: (1) kerangka berpikir yang menjelaskan mengapa sesuatu dirancang
+begitu, (2) alur dan aturan bisnis yang menjelaskan apa yang terjadi, dan (3) tabel kebutuhan bernomor yang
+dapat dijadikan backlog dan dilacak (traceability) sampai ke skenario penerimaan di Bagian 20.
+Konvensi
+Simbol
+Arti
+M (Must)
+Wajib ada pada rilis yang dipakai klinik. Tanpa ini, tujuan kontrol dan operasional tidak tercapai.
+S (Should)
+Sangat disarankan; boleh menyusul pada fase berikutnya bila ada kendala waktu, tetapi arsitektur tidak
+boleh menutup kemungkinan ini.
+C (Could)
+Nilai tambah. Dikerjakan bila kapasitas memungkinkan.
+ID kebutuhan
+Format KODE-NN, misalnya DR-12 (Dokter), FA-31 (Farmasi), KS-08 (Kasir). Dipakai di skenario
+penerimaan dan pelacakan.
+Empat jenis kotak berwarna dipakai konsisten di seluruh dokumen:
+KERANGKA BERPIKIR
+Menjelaskan alasan di balik rancangan. Bila ada keraguan saat implementasi, kembali ke sini: keputusan teknis
+yang menyimpang dari alasan ini kemungkinan keliru.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Sudah diputuskan pemilik klinik. Bukan untuk dinegosiasikan ulang tanpa persetujuan pemilik.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Rekomendasi yang belum dijawab pemilik. Bangun sebagai konfigurasi yang mudah diubah, jangan di-hard-code,
+sampai ada konfirmasi.
+ATURAN BISNIS
+Aturan yang harus ditegakkan oleh sistem secara teknis (bukan hanya dokumen SOP).
+1.1 Di dalam dan di luar cakupan
+Di dalam cakupan: pendaftaran dan antrian, intake perawat, rekam medis elektronik per kunjungan, praktik
+dokter umum, spesialis anak dan dokter gigi, resep elektronik, instalasi farmasi/apotek (pengadaan, stok,
+pelayanan resep, pelaporan narkotika/psikotropika, kontrabon, vaksin, pemusnahan, OTC), kasir klinik dan kasir
+farmasi, komunikasi internal, kontrol dan deteksi anomali, dashboard owner/manajer, jadwal maintenance alat,
+audit trail.
+Belum dibahas pemilik (arsitektur tidak boleh menutup kemungkinannya): order laboratorium dan radiologi,
+klaim BPJS/asuransi, akuntansi buku besar penuh, penggajian, multi-cabang. Untuk multi-cabang, sertakan
+branch_id pada entitas transaksi sejak awal walaupun sekarang hanya satu klinik.
+
+===== PAGE 6 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 6
+2. Latar Belakang dan Tujuan Bisnis
+Pemilik menjalankan klinik yang berfokus pada anak, keluarga dan gigi. Kebutuhan utamanya adalah data yang
+tertata sehingga pemilik dapat mengontrol operasional, melihat pertumbuhan bisnis, dan menemukan anomali
+pada setiap role atau divisi. Tujuan yang harus tercapai:
+
+Operasional dan proses delivery layanan berjalan mulus dari pendaftaran sampai pasien pulang, tanpa
+data hilang di antara divisi.
+
+Arsip (rekam medis, resep, faktur) tersimpan rapi, dapat ditelusur cepat, dan sesuai masa retensi regulasi.
+
+Finansial bersih: setiap rupiah dapat dilacak dari tindakan medis/resep sampai kas, dan kebocoran tidak
+mungkin terjadi diam-diam.
+
+Pengelolaan stok obat akurat: kartu stok per item, kadaluarsa terpantau, selisih terdeteksi.
+
+Maintenance alat terjadwal, bukan mengandalkan ingatan staf.
+
+Kontroling: anomali muncul sebagai peringatan pada hari yang sama, bukan ditemukan saat audit bulanan.
+Ukuran keberhasilan
+
+Tidak ada satu pun pekerjaan farmasi/kasir yang harus dikerjakan di luar sistem (rekap manual, catatan
+kertas, spreadsheet pendamping).
+
+Untuk setiap kunjungan pasien, dapat ditelusuri rantai lengkap: kunjungan, tindakan/resep, stok yang keluar,
+tagihan, pembayaran, shift kasir.
+
+Pasien yang sudah diperiksa tetapi tidak ada transaksi kasirnya muncul sebagai anomali pada hari yang
+sama.
+
+Dokter merasa sedang menulis catatan klinis dan resep, bukan mengisi formulir administrasi.
+3. Kerangka Berpikir dan Prinsip Desain
+Sepuluh prinsip berikut adalah cara berpikir di balik seluruh fitur. Engineer yang memahami prinsip ini akan
+dapat memutuskan kasus yang tidak tertulis di dokumen dengan arah yang sama dengan pemilik. Setiap prinsip
+disertai alasan dan implikasi teknis.
+P1. Dokter bekerja secara klinis, sistem bekerja secara administratif.
+Alasan: Waktu konsultasi terbatas. Formulir panjang membuat dokter melawan software: catatan asal-asalan
+atau dilewati, sehingga data menjadi buruk dan tujuan kontrol gagal.
+Implikasi teknis: UX bebas dan sederhana (teks bebas untuk resep, satu workspace klinis). Struktur data,
+validasi, routing ke divisi, dan pembuatan dokumen resmi dilakukan di belakang layar. Prinsip ringkas: UX bebas,
+data backend tetap terstruktur.
+P2. Kontrol dibangun ke dalam desain (prevention by design), bukan ditemukan setelah kejadian.
+Alasan: Titik kebocoran terbesar ada di kasir (harga/diskon/void), stok obat, dan pencatatan tindakan yang tidak
+tertagih. Deteksi lewat audit bulanan terlalu terlambat.
+Implikasi teknis: Tidak ada field harga manual. Void butuh persetujuan kedua. Rekonsiliasi lintas modul berjalan
+otomatis. Mesin aturan anomali (Bagian 19) berjalan harian dan menghasilkan peringatan.
+P3. Satu sumber kebenaran, tanpa input ganda.
+Alasan: Setiap input ulang adalah waktu yang terbuang dan peluang data berbeda antar modul.
+Implikasi teknis: Harga ditarik dari master. Stok bahan racik dan obat jadi satu master. Tagihan terbentuk
+otomatis dari tindakan dan resep. Data vital diinput sekali. Simpan snapshot harga pada transaksi agar histori
+tidak berubah bila master berubah.
+P4. Semua terhubung lewat Patient ID dan Encounter (Visit) ID.
+Alasan: Resep atau tagihan yang tidak jelas berasal dari kunjungan mana membuat audit dan rekonsiliasi
+mustahil.
+Implikasi teknis: Foreign key wajib dari resep, rujukan, surat, tindakan, invoice ke Encounter. Modul klinis
+(rekam medis umum, odontogram, growth chart) terpisah secara tampilan tetapi terhubung lewat Patient ID.
+Pengecualian yang disengaja: transaksi OTC (12.15) tidak terikat Encounter.
+
+===== PAGE 7 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 7
+P5. Least privilege by default; akses rekam medis berdasarkan penugasan.
+Alasan: Privasi pasien, turnover staf, dan kepatuhan data kesehatan. Front desk paling sering berinteraksi
+dengan pihak luar sehingga akses berlebihan di sana adalah risiko terbesar.
+Implikasi teknis: Role baru mulai dari akses minimum. Kebijakan akses = role + relasi (mis. dokter hanya untuk
+pasien yang sedang ia terima). Akses di luar itu butuh alasan tercatat dan menghasilkan peringatan.
+P6. Jejak audit permanen dan tidak dapat diubah siapa pun.
+Alasan: Semua kontrol lain tidak berarti jika saat investigasi log-nya bisa diedit atau dihapus.
+Implikasi teknis: Tabel audit append-only. Tidak ada endpoint edit/hapus untuk peran apa pun, termasuk owner
+dan administrator. Pertimbangkan hash berantai untuk mendeteksi manipulasi di level basis data.
+P7. Pemisahan tugas (segregation of duties): yang mengawasi bukan yang mengeksekusi.
+Alasan: Jika pengawas dapat mengubah data operasional, jejak audit kabur: tidak jelas perubahan berasal dari
+staf atau atasan.
+Implikasi teknis: Owner bersifat read-only untuk operasional harian. Perawat hanya menambah data dan tidak
+dapat menyunting entri dokter. Farmasi tidak mengubah isi resep. Kasir tidak mengubah harga. Persetujuan
+(approval) dilakukan oleh orang berbeda dari pembuat. Berlaku juga pada pemusnahan obat (pembuat daftar vs
+penyetuju) dan penjualan OTC golongan bebas terbatas (penjual vs pengawas apoteker).
+P8. Konfigurasi, bukan hard-code.
+Alasan: Regulasi berubah (format kop resep, masa retensi, format pelaporan), dan ambang kontrol berbeda tiap
+klinik.
+Implikasi teknis: Parameter berikut harus dapat diubah admin tanpa deploy ulang: template dokumen resmi,
+parameter vital per poli, ambang anomali, hari kontrabon/pembayaran, aturan margin, aturan diskon, langkah
+pecahan sediaan, role kustom, ambang notifikasi ED bertingkat, batas stabilitas BUD per jenis sediaan, periode
+jadwal pemusnahan.
+P9. Otomatisasi penuh untuk pekerjaan administratif berulang.
+Alasan: Pekerjaan manual berulang adalah sumber telat, salah, dan celah. Pemilik menetapkan bahwa tidak ada
+yang dikerjakan di luar sistem.
+Implikasi teknis: Otomatis: kartu stok, rekap SIPNAP, etiket, defecta, pengingat jatuh tempo, konversi dosis,
+reminder imunisasi dan kontrol, pengelompokan kontrabon, draft berita acara pemusnahan, perhitungan BUD
+racikan.
+P10. Keselamatan pasien di atas kenyamanan, tanpa menghambat alur.
+Alasan: Kesalahan obat berdampak langsung pada pasien. Namun pemblokiran berlebihan membuat staf
+mencari jalan pintas.
+Implikasi teknis: Aturan dua tingkat: peringatan klinis (alergi, interaksi, pecahan sediaan ganjil, cold chain
+breach) bersifat soft-stop yang dapat dilanjutkan dengan alasan tercatat, kecuali batch vaksin tidak layak yang
+bersifat hard-stop (lihat 12.12). Pelanggaran integritas (edit log audit, harga manual, edit resep yang sudah
+ditandatangani, obat keras lewat jalur OTC) bersifat hard-stop.
+
+===== PAGE 8 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 8
+4. Aktor dan Role
+Sembilan fungsi kerja di lapangan menjadi acuan role. Pada klinik kecil beberapa role dapat digabung (mis. kasir
+merangkap front desk), sehingga sistem harus mendukung satu pengguna memegang lebih dari satu role
+dengan jejak audit yang tetap menyebutkan role yang aktif saat aksi dilakukan.
+Role
+Tugas inti
+Prinsip akses
+Owner / Manajemen
+Puncak
+Monitoring strategis, persetujuan kebijakan harga
+dan diskon, audit lintas divisi, analisis tren.
+Lihat semua ringkasan dan laporan;
+read-only untuk operasional harian; tidak
+membuka rekam medis kecuali dengan
+alasan tercatat.
+Dokter Umum / Keluarga
+Anamnesis, pemeriksaan, diagnosis, resep,
+rujukan, surat sakit.
+Hanya pasien yang sedang ia terima; tidak
+melihat harga pokok/margin.
+Dokter Spesialis Anak
+Seperti dokter umum, ditambah tumbuh kembang
+dan imunisasi.
+Terhubung ke akun keluarga (wali).
+Dokter Gigi
+Pemeriksaan gigi, odontogram, rencana perawatan
+multi-sesi, tindakan.
+Modul odontogram terpisah tetapi terhubung
+ke Patient ID.
+Perawat / Asisten Medis
+Intake: vital sign, alergi, keluhan; persiapan
+tindakan; sterilisasi alat.
+Menambah data, tidak menyunting entri
+dokter, tidak menulis diagnosis atau resep.
+Front Desk /
+Resepsionis
+Pendaftaran, reservasi, antrian, cetak surat, pasien
+pulang.
+Tidak melihat isi rekam medis; tidak melihat
+keuangan agregat; tidak mengubah harga.
+Kasir (klinik dan
+farmasi)
+Penagihan dan penerimaan pembayaran, shift kas.
+Harga dari master saja; void via persetujuan
+kedua.
+Apoteker / Petugas
+Farmasi
+Verifikasi resep, dispensing, stok, pengadaan,
+pelaporan narkotika/psikotropika, vaksin,
+pemusnahan, OTC.
+Tidak mengubah isi resep dokter; akses RM
+hanya pada resep terkait.
+Asisten Farmasi
+Membuat defecta, input faktur, membantu
+penyiapan obat, penjualan OTC obat bebas.
+Draft; persetujuan SP, pemusnahan dan
+OTC bebas terbatas oleh apoteker.
+Manajer Operasional /
+Supervisor
+Pantau performa divisi, jadwal maintenance, shift
+SDM, persetujuan rutin (mis. void).
+Melihat laporan performa; tidak melihat data
+gaji/margin per dokter; tidak membuka
+rekam medis.
+CATATAN UNTUK ENGINEER
+Sistem harus mendukung role kustom yang dibuat owner tanpa bantuan vendor (permission granular per fitur),
+bukan hanya preset. Matriks izin lengkap ada di Bagian 6.
+5. Arsitektur Konseptual dan Model Data
+Bagian ini teknologi-netral. Pilihan bahasa, framework dan basis data diserahkan kepada tim, dengan syarat
+memenuhi kebutuhan integritas berikut.
+5.1 Enam domain fungsional
+Domain
+Isi
+Sifat data
+Clinical Record
+Pasien, kunjungan (encounter), vital, alergi, catatan klinis,
+odontogram, growth chart, imunisasi.
+Sensitif; versi tercatat; akses
+berbasis penugasan.
+Order / Action
+Routing
+Semua tindak lanjut dokter (resep, rujukan, surat, tindakan)
+sebagai Order dengan tujuan divisi dan status.
+Event-driven; setiap perubahan
+status tercatat.
+
+===== PAGE 9 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 9
+Domain
+Isi
+Sifat data
+Inventory Ledger
+Master obat, batch, mutasi stok, SP, faktur pembelian,
+kontrabon, opname, supplier per obat, log suhu vaksin,
+pemusnahan.
+Append-only; saldo diturunkan dari
+mutasi.
+Billing & Cash
+Master harga, aturan diskon, invoice, pembayaran, shift kas,
+void/refund, penjualan OTC.
+Snapshot harga; transaksi
+imutabel; koreksi lewat entri baru.
+Control & Audit
+Audit log, mesin aturan anomali, checklist tugas, notifikasi.
+Append-only; tidak dapat diubah
+siapa pun.
+Communication
+Memo terarah, broadcast, notifikasi pasien (WA/SMS), antrian
+cetak.
+Berstatus; ada penerimaan/baca.
+5.2 Persyaratan integritas teknis
+ATURAN BISNIS
+(1) Mutasi stok dan pembuatan tagihan dilakukan dalam transaksi basis data atomik: tidak boleh ada obat
+keluar tanpa mutasi, atau tagihan tanpa sumber. (2) Saldo stok tidak disimpan sebagai angka yang diedit;
+saldo = jumlah seluruh mutasi (boleh di-cache, tetapi sumber kebenaran adalah mutasi). (3) Transaksi keuangan
+dan dokumen yang sudah SIGNED/PAID imutabel; koreksi dilakukan dengan entri pembalik atau versi baru yang
+menaut ke aslinya. (4) Penanganan konkurensi: dua kasir/farmasis tidak boleh menjual batch yang sama secara
+bersamaan melebihi saldo (gunakan penguncian baris atau optimistic locking). (5) Routing Order harus
+idempoten: tombol kirim ditekan dua kali tidak membuat dua resep di farmasi.
+5.3 Peristiwa domain (domain events)
+Disarankan arsitektur berbasis peristiwa (event) dengan pola outbox agar notifikasi, mesin aturan, checklist dan
+dashboard bereaksi tanpa membebani alur utama. Peristiwa minimal:
+PatientRegistered, AppointmentCreated/Changed/Cancelled, VisitQueued, PatientCalled,
+VisitAccepted, VitalsRecorded, AllergyRecorded, ClinicalNoteSaved, OrderCreated(type),
+PrescriptionSigned, PrescriptionSent, PrescriptionReceived, PrescriptionVerified,
+PrescriptionReturnedToDoctor, DispensingCompleted, StockMoved, InvoiceCreated, PaymentReceived,
+VoidRequested/Approved, ShiftOpened/Closed, SupplierInvoiceReceived, InvoiceDueSoon(H-7),
+KontrabonCreated, MemoSent, TaskCompleted, AnomalyRaised, VaccineTempLogged, VaccineTempBreach,
+BatchMarkedUnfit, DestructionBatchQueued, DestructionApproved, DestructionRecorded,
+OTCSaleCompleted
+5.4 Entitas inti dan field kunci
+Nama bersifat ilustratif. Yang wajib dipatuhi adalah relasi dan sifat imutabilitas.
+Entitas
+Field kunci
+Catatan
+Patient /
+FamilyAccount
+id, no_rm, nama, tgl_lahir, jenis_kelamin, kontak, family_id (wali),
+kelompok_pasien (umum/keluarga/karyawan)
+Anak terhubung ke wali;
+notifikasi ke wali.
+User / Role /
+Permission
+id, nama, role_ids[], sip_no, str_no, aktif
+Satu user boleh banyak role;
+sip untuk dokter tampil di
+resep.
+Appointment
+id, patient_id, doctor_id, slot, kanal (walk-in/telepon/online), status
+Perubahan slot tercatat.
+Visit (Encounter)
+id, patient_id, doctor_id, poli (umum/anak/gigi), no_antrian, status,
+waktu tiap status
+Poros semua data klinis dan
+finansial.
+VitalSign
+visit_id, bb, tb, suhu, td_sis, td_dia, nadi, rr, spo2, lingkar_kepala*,
+diinput_oleh, waktu, versi
+Parameter configurable per
+poli; versi, bukan timpa.
+
+===== PAGE 10 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 10
+Entitas
+Field kunci
+Catatan
+Allergy
+patient_id, agen, jenis (obat/lain), reaksi, sumber, dicatat_oleh
+Level pasien, diverifikasi
+ulang tiap kunjungan.
+ClinicalNote
+visit_id, tipe
+(anamnesis/pemeriksaan/assessment/diagnosis/catatan), teks,
+kode_icd?, penulis, versi
+Milik dokter; versi tercatat.
+Order
+id, visit_id, tipe, tujuan_divisi, status, dibuat_oleh, waktu status
+Supertipe untuk resep,
+rujukan, surat, tindakan.
+Prescription
+id, visit_id, dokter_id, teks_asli, iter_tipe/iter_jumlah, status,
+signed_at, signature_ref, versi, template_version, sumber
+(internal/eksternal)
+SIGNED = imutabel; revisi =
+versi baru.
+PrescriptionItem
+id, prescription_id, no_baris, teks_baris, drug_id?, dosis, satuan,
+frekuensi, rute, durasi, jumlah, signa, is_racik, grup_racik,
+status_parse (cocok/ambigu/tak dikenali), dikonfirmasi_dokter,
+bud_tanggal
+Hasil parsing dari teks bebas;
+bud_tanggal khusus item
+racikan (12.13).
+Dispensing /
+DispensingLine
+prescription_item_id, batch_id, jumlah_diserahkan, sisa,
+flag_det/nedet/iter, diserahkan_oleh, waktu
+Sumber status tebus
+sebagian.
+Drug
+id, nama, generik, kekuatan, bentuk, satuan, satuan_konversi,
+golongan
+(bebas/bebas_terbatas/keras/narkotika/psikotropika/prekursor),
+rute, kategori_etiket, reorder_point, harga_beli_ref, is_vaksin,
+kategori_bud
+Master tunggal untuk obat
+jadi dan bahan racik.
+golongan menentukan jalur
+OTC (12.15).
+DrugBatch
+id, drug_id, no_batch, ed, supplier_invoice_line_id, status_vaksin
+(layak/dicurigai/tidak_layak)*
+Dasar FEFO dan telusur
+recall; status_vaksin hanya
+untuk item is_vaksin=true.
+StockMovement
+id, drug_id, batch_id, tipe (IN/OUT_RESEP/OUT_OTC/RETUR/RU
+SAK/ED/OPNAME/PEMUSNAHAN), qty, cost_unit, ref_tipe, ref_id,
+aktor, waktu
+Append-only; sumber saldo;
+cost_unit mengikuti
+FIFO/FEFO (12.17).
+Supplier /
+DrugSupplier
+supplier: id, nama, kontak; DrugSupplier: drug_id, supplier_id,
+harga_terakhir, lead_time, prioritas, aktif
+Satu obat dapat punya
+banyak supplier (12.16).
+PurchaseOrder (SP)
+no_sp, jenis (reguler/narkotika/psikotropika/prekursor), supplier_id,
+status, disetujui_oleh, lines
+Nomor urut per jenis.
+SupplierInvoice
+no_faktur, supplier_id, tgl, jatuh_tempo (wajib), lines, status
+(diterima/terverifikasi/kontrabon/terjadwal/lunas)
+Cross-check dengan SP.
+Kontrabon /
+PaymentSchedule
+no, invoice_ids[], tgl_kontrabon, tgl_bayar_terjadwal, status
+Mengikuti hari
+kontrabon/bayar yang
+dikonfigurasi.
+PricePolicy /
+DiscountRule
+drug_id/layanan_id, harga_jual, aturan_margin, berlaku_mulai,
+disetujui_oleh; rule diskon: kelompok, persen/nominal
+Berversi; tidak ada edit di
+tempat.
+Invoice / InvoiceLine
+id, visit_id (nullable untuk OTC), titik_kasir (klinik/farmasi), status;
+line: sumber_tipe (tindakan/obat/embalase/kemasan/otc),
+sumber_id, harga_snapshot, diskon_rule_id
+Tiap line menaut ke
+sumbernya; visit_id nullable
+untuk transaksi OTC.
+OTCSale
+id, invoice_id, pembeli_nama?, pembeli_kontak?,
+apoteker_pengawas_id (wajib untuk item bebas terbatas), waktu
+Transaksi tanpa Encounter
+(12.15).
+Payment / CashShift
+metode, jumlah, referensi, shift_id; shift: kasir, titik, kas_awal,
+kas_akhir_sistem, kas_akhir_fisik, selisih
+Pembayaran non-tunai punya
+bukti sistem.
+VoidRequest
+invoice_id, alasan, diminta_oleh, disetujui_oleh, waktu
+Approval kedua wajib.
+VaccineTempLog
+id, lokasi_kulkas, waktu, suhu, sumber (manual/sensor),
+dicatat_oleh, status (normal/breach)
+12.12; sumber disiapkan
+untuk integrasi sensor IoT di
+fase lanjutan.
+
+===== PAGE 11 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 11
+Entitas
+Field kunci
+Catatan
+DestructionBatch /
+DestructionRecord
+Batch: periode (semester), status (draft/approved/executed),
+item_ids[]; Record: no_berita_acara, disetujui_oleh (APA),
+dokumen_scan, tanggal_eksekusi
+12.14; mutasi
+PEMUSNAHAN menaut ke
+DestructionRecord.
+AuditLog
+id, waktu, aktor, role_aktif, perangkat, ip, aksi, entitas, entitas_id,
+sebelum, sesudah, alasan, hash_prev, hash
+Append-only; hash berantai.
+Memo / MemoReceipt
+dari, ke (role/orang/semua), kategori, subjek, isi, tautan_entitas,
+status, berlaku_dari/sampai
+Status dan tanda dibaca.
+Task (Checklist)
+modul, jenis, frekuensi, jatuh_tempo, status, diselesaikan_oleh,
+waktu, tautan_entitas
+Basis ceklis pekerjaan.
+Equipment /
+MaintenanceLog
+alat, lokasi, interval, jadwal_berikut, status, riwayat servis
+Reminder preventif.
+Document
+tipe, entitas_id, versi, template_version, berkas_render, hash
+Resep/surat resmi imutabel.
+PrintJob / Notification
+dokumen, tujuan, status (antri/dicetak/diserahkan); kanal, template,
+status kirim
+Antrian cetak resepsionis.
+Odontogram /
+TreatmentPlan
+patient_id, kondisi per gigi (notasi FDI), rencana, item, sesi, paket
+Lihat Bagian 11.
+GrowthMeasurement /
+Immunization
+patient_id, tanggal, bb, tb, lk; jadwal vaksin, tgl diberikan
+Lihat Bagian 11.
+* opsional/konfigurable.
+5.5 Mesin status (state machine)
+Entitas
+Status berurutan
+Aturan transisi penting
+Visit
+REGISTERED, WAITING, CALLED, INTAKE_DONE,
+IN_SERVICE, COMPLETED, CLOSED (atau
+CANCELLED / NO_SHOW)
+IN_SERVICE hanya lewat aksi dokter
+'Terima Pasien'. CLOSED hanya bila
+semua Order final dan invoice
+PAID/dibatalkan sah.
+Prescription
+DRAFT, SIGNED, SENT_TO_PHARMACY, RECEIVED,
+VERIFIED, PROCESSING, READY, DISPENSED (atau
+RETURNED_TO_DOCTOR, PARTIAL,
+NOT_COLLECTED)
+SIGNED tidak dapat diubah.
+RETURNED_TO_DOCTOR memaksa
+dokter membuat versi baru.
+Dokumen surat
+(sakit/rujukan)
+DRAFT, SIGNED, SENT_TO_RECEPTION, PRINTED,
+HANDED_TO_PATIENT
+Batas waktu wajar cetak dipantau (RL-16).
+Faktur pembelian
+RECEIVED, VERIFIED, IN_KONTRABON,
+SCHEDULED, PAID
+Masuk IN_KONTRABON otomatis pada
+H-7 jatuh tempo.
+Shift kas
+OPEN, CLOSING, RECONCILED, DEPOSITED
+RECONCILED wajib menyimpan selisih
+apa pun nilainya.
+Memo
+NEW, READ, IN_PROGRESS, DONE
+Melewati SLA menandai overdue.
+DrugBatch (khusus
+vaksin)
+LAYAK, DICURIGAI, TIDAK_LAYAK
+TIDAK_LAYAK mengunci batch dari
+dispensing (hard-stop); keputusan oleh
+apoteker penanggung jawab.
+DestructionBatch
+DRAFT (terkumpul otomatis), APPROVED, EXECUTED
+APPROVED oleh apoteker penanggung
+jawab; EXECUTED setelah dokumen fisik
+discan.
+
+===== PAGE 12 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 12
+6. Model Izin (RBAC) dan Matriks Akses
+Matriks berikut adalah default awal. Prinsipnya least privilege: sel kosong berarti tidak ada akses. Owner dapat
+membuat role kustom dan menyesuaikan izin tanpa bantuan vendor.
+Singkatan kolom: OWN = Owner; DOK = Dokter Umum/Spesialis Anak; DGI = Dokter Gigi; PRW = Perawat; FD
+= Front Desk; KSR = Kasir; APT = Apoteker; AFA = Asisten Farmasi; MGR = Manajer Operasional.
+Kode sel: L = lihat; B = buat; U = ubah (selalu menghasilkan versi baru, bukan menimpa); A =
+menyetujui/otorisasi; P = proses/cetak; T = terbatas oleh konteks (dijelaskan di bawah); G = hanya
+agregat/statistik tanpa identitas; S = hanya status; - = tidak ada akses; A* = bergantung asumsi yang belum
+dikonfirmasi.
+Sumber daya / fungsi
+ OWN
+ DOK
+ DGI
+ PRW
+ FD
+ KSR
+ APT
+ AFA
+ MGR
+Data demografi pasien
+ G
+ L
+ L
+ L
+ B L U
+ L T
+ L T
+ L T
+ G
+Jadwal dan antrian
+ L
+ L T
+ L T
+ L
+ L
+ B L U
+ -
+ -
+ L
+Intake: vital, alergi, keluhan awal
+ -
+ L
+ L
+ B L U T
+ -
+ -
+ L T
+ L T
+ -
+Anamnesis, pemeriksaan, diagnosis
+(RM klinis)
+ -
+ B L U T
+ B L U T
+ L T
+ S
+ -
+ L T
+ -
+ -
+Odontogram dan rencana perawatan
+ -
+ -
+ B L U T
+ L T
+ -
+ L T
+ -
+ -
+ -
+Growth chart dan imunisasi
+ G
+ B L U T
+ -
+ B L
+ L T
+ -
+ -
+ -
+ G
+Resep: tulis, tanda tangan, kirim
+ G
+ B U T
+ B U T
+ -
+ -
+ -
+ L T
+ L T
+ -
+Verifikasi dan dispensing resep
+ -
+ -
+ -
+ -
+ -
+ -
+ B U P
+ P T
+ -
+Surat sakit dan rujukan
+ -
+ B
+ B
+ -
+ P L
+ -
+ -
+ -
+ -
+Master obat dan supplier per obat
+ L
+ L T
+ L T
+ -
+ -
+ L T
+ B U
+ B T
+ L
+Harga jual dan aturan diskon
+ A L
+ -
+ -
+ -
+ -
+ L
+ B U T
+ L
+ L
+Stok dan kartu stok
+ L
+ L T
+ L T
+ -
+ -
+ -
+ B L
+ B L T
+ L
+Defecta dan SP
+ L
+ -
+ -
+ -
+ -
+ -
+ B A
+ B
+ L
+Faktur pembelian, kontrabon, jadwal
+bayar
+ L A*
+ -
+ -
+ -
+ -
+ -
+ B U
+ B
+ L
+Narkotika/psikotropika (stok, resep,
+SIPNAP)
+ L
+ B T
+ B T
+ -
+ -
+ -
+ B L U
+ -
+ -
+Vaksin: log suhu dan status batch
+ L
+ L
+ -
+ B T
+ -
+ -
+ B L U A
+ B L T
+ L
+Pemusnahan obat (daftar, berita
+acara)
+ L A
+ -
+ -
+ -
+ -
+ -
+ B A
+ L T
+ L
+Penjualan OTC
+ L
+ -
+ -
+ -
+ -
+ B L (far
+ masi)
+ B A
+(bebas t
+erbatas)
+ B
+(bebas)
+ L
+Transaksi dan pembayaran
+ L
+ -
+ -
+ -
+ -
+ B L
+ -
+ -
+ L
+Void dan refund
+ A* T
+ -
+ -
+ -
+ -
+ B
+ -
+ -
+ A
+Shift kas dan rekonsiliasi
+ L
+ -
+ -
+ -
+ -
+ B L
+ -
+ -
+ L A
+Laporan keuangan agregat dan margin
+ L
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ L T
+Dashboard anomali
+ L
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ L
+Maintenance alat
+ L
+ L
+ L
+ B T
+ -
+ -
+ -
+ -
+ B U
+Memo terarah
+ B L
+ B L
+ B L
+ B L
+ B L
+ B L
+ B L
+ B L
+ B L
+Broadcast pengumuman
+ B
+ L
+ L
+ L
+ L
+ L
+ L
+ L
+ B
+Ceklis pekerjaan
+ L
+ -
+ -
+ L T
+ L T
+ L T
+ B L
+ L T
+ L
+Audit log
+ L
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ L T
+
+===== PAGE 13 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 13
+Sumber daya / fungsi
+ OWN
+ DOK
+ DGI
+ PRW
+ FD
+ KSR
+ APT
+ AFA
+ MGR
+Manajemen user, role, permission
+ B U
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+Konfigurasi sistem (template, ambang,
+parameter)
+ U
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+Arti kode T (terbatas oleh konteks)
+
+Rekam medis klinis (DOK/DGI): hanya untuk pasien yang sudah diterima dokter tersebut dalam kunjungan
+aktif. Membuka pasien di luar itu memerlukan alasan tercatat (lihat break-glass).
+
+Jadwal dan antrian (DOK/DGI): hanya antrian dan jadwal dokter tersebut.
+
+Perawat pada RM klinis: hanya bagian yang relevan untuk persiapan tindakan; tidak dapat menyunting entri
+dokter.
+
+Apoteker/asisten pada RM: hanya alergi, obat rutin, dan data terkait resep yang sedang diproses.
+
+Kasir pada rencana perawatan gigi: hanya estimasi biaya dan status sesi untuk penagihan.
+
+Dokter pada stok: status kualitatif (tersedia/menipis/kosong). Angka detail terbuka lewat klik lanjutan
+(asumsi, lihat 10.6).
+
+Harga jual oleh apoteker: dalam batas aturan margin kebijakan owner; di luar batas memerlukan
+persetujuan owner.
+
+Narkotika/psikotropika dan vaksin: hanya staf farmasi yang ditunjuk secara eksplisit.
+
+Pemusnahan oleh asisten farmasi: hanya mengusulkan/menyiapkan daftar; persetujuan dan tanda tangan
+berita acara oleh apoteker penanggung jawab.
+
+OTC oleh asisten farmasi: hanya golongan bebas; golongan bebas terbatas wajib otorisasi apoteker
+pengawas.
+
+Manajer pada laporan keuangan: tanpa data gaji dan margin per dokter.
+ATURAN BISNIS
+Aturan tetap: (1) tidak ada peran yang dapat mengubah atau menghapus audit log; endpoint semacam itu tidak
+boleh ada. (2) Owner bersifat read-only pada data operasional harian. (3) Pembuat dan penyetuju suatu aksi
+harus dua orang berbeda (void, harga di luar batas, SP, pemusnahan, OTC bebas terbatas). (4) Bila satu orang
+memegang beberapa role, sistem meminta memilih role aktif dan mencatatnya di audit log.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Break-glass (S): dokter/apoteker boleh membuka rekam medis di luar konteks penugasan untuk kebutuhan
+mendesak dengan mengisi alasan; aksi ini mengirim peringatan ke manajer/owner dan tercatat permanen.
+Riwayat lintas dokter: untuk pasien yang sedang diterima, dokter boleh melihat riwayat kunjungan pasien
+tersebut dari dokter lain di klinik yang sama (kontinuitas perawatan); yang butuh alasan tercatat adalah membuka
+pasien yang bukan sedang ia tangani. Ini tafsir dari batasan 'tidak melihat RM dokter lain kecuali rujukan internal
+dengan alasan tercatat'.
+7. Alur End-to-End Pasien
+Alur ini adalah tulang punggung. Setiap modul di bagian berikutnya adalah pendalaman satu atau lebih langkah
+di sini.
+Reservasi/Walk-in -> ANTRIAN (WAITING) -> Dipanggil (CALLED)
+   -> INTAKE Perawat (INTAKE_DONE)
+   -> Dokter [TERIMA PASIEN] (IN_SERVICE) -> Anamnesis / Pemeriksaan / Diagnosis
+   -> TINDAKAN (Order):
+        |-> Resep ............ -> FARMASI -> Kasir Farmasi
+        |-> Rujukan / Surat .. -> Antrian cetak Resepsionis
+        |-> Tindakan lain .... (gigi: odontogram, rencana perawatan)
+   -> [SELESAIKAN KUNJUNGAN] (COMPLETED) -> Kasir Klinik
+   -> Pasien pulang (CLOSED) + reminder kontrol/imunisasi otomatis
+(Jalur paralel, tanpa Visit) Pembeli OTC -> Loket Farmasi -> Kasir Farmasi
+
+===== PAGE 14 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 14
+#
+Langkah
+Role
+Input
+Output / status
+1
+Reservasi, janji temu,
+konsultasi online, atau
+walk-in
+Front desk
+Data pasien, keluhan awal, pilihan
+dokter, jadwal
+Antrian per dokter; notifikasi janji
+temu. Visit = WAITING
+2
+Intake
+Perawat
+BB, TB, suhu, tensi, nadi/RR/SpO2
+(configurable), alergi, keluhan saat ini,
+checklist alat steril
+Data vital masuk RM; tampil
+read-only ke dokter; status kesiapan
+ruang. Visit = INTAKE_DONE
+3
+Pemeriksaan
+Dokter
+Anamnesis, pemeriksaan, assessment,
+diagnosis, catatan
+RM terupdate. Visit = IN_SERVICE
+3b
+Jalur gigi
+Dokter gigi
+Pemeriksaan rongga mulut,
+odontogram, rencana perawatan
+Odontogram, riwayat tindakan,
+estimasi biaya, jadwal sesi lanjutan
+4
+Tindakan lanjutan
+Dokter
+Klik Resep / Rujukan / Surat sakit /
+Tindakan
+Order terbentuk dan otomatis menuju
+divisi tujuan
+5
+Selesai kunjungan
+Dokter
+Konfirmasi
+Visit = COMPLETED; pemicu
+penagihan tindakan
+6
+Penebusan resep (bila
+ada)
+Apoteker
+E-resep, status racik/non-racik
+Obat diserahkan, etiket, PIO
+(opsional), tagihan farmasi. Bayar di
+kasir farmasi
+7
+Pembayaran layanan
+Kasir klinik
+Rincian tindakan dari dokter (otomatis
+dari master)
+Kuitansi; terekonsiliasi dengan
+tindakan
+8
+Pulang
+Front desk /
+sistem
+Status seluruh tahap
+Visit = CLOSED; reminder kontrol
+dijadwalkan
+ATURAN BISNIS
+Dua titik kasir per kunjungan: tagihan layanan/tindakan dibayar di kasir klinik, tagihan obat dibayar di kasir
+farmasi (ketentuan pemilik). Sebuah Visit dapat memiliki dua Invoice dengan atribut titik_kasir berbeda. Visit
+baru boleh CLOSED bila kedua invoice berstatus PAID atau dibatalkan secara sah. Rekonsiliasi harian (RL-06,
+RL-20) membandingkan Visit COMPLETED dengan invoice di kedua titik. Jalur OTC (12.15) tidak melalui alur
+ini sama sekali: tanpa Visit, langsung di loket farmasi dan kasir farmasi.
+8. Modul Front Desk dan Antrian
+KERANGKA BERPIKIR
+Front desk adalah titik kontak paling sering dengan pihak luar dan turnover stafnya biasanya tinggi. Karena itu
+aksesnya sengaja sempit: cukup untuk melayani pendaftaran dan antrian, tidak cukup untuk membaca isi rekam
+medis atau melihat keuangan. Kebocoran booking (slot dibatalkan lalu di-booking ulang di luar sistem untuk
+'titipan') dicegah dengan mencatat semua perubahan slot.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FD-01
+Pendaftaran pasien baru dan lama: cari lewat nama, no RM,
+telepon. Peringatan bila nama + tanggal lahir mirip data yang
+sudah ada (cegah duplikat).
+M
+Duplikat RM merusak riwayat dan
+alergi.
+FD-02
+Akun keluarga: satu wali memiliki beberapa anak. Kontak dan
+notifikasi anak diarahkan ke wali.
+M
+Basis growth chart dan reminder
+imunisasi.
+FD-03
+Reservasi per dokter berdasarkan jadwal praktik; cegah slot
+bentrok. Kanal: walk-in, telepon (diinput resepsionis),
+online/konsultasi online.
+M
+Kanal online mengikuti catatan pemilik
+'konsultasi online'; bentuk teknisnya
+ditentukan tim.
+
+===== PAGE 15 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 15
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FD-04
+Antrian per dokter dengan nomor dan status WAITING, CALLED,
+IN_SERVICE, COMPLETED; daftar kunjungan hari ini per
+dokter.
+M
+Sumber tampilan antrian dokter dan
+perawat.
+FD-05
+Notifikasi konfirmasi janji temu (WA/SMS) dan pengingat
+menjelang jadwal (waktu pengingat configurable).
+M
+Kurangi no-show.
+FD-06
+Front desk tidak melihat isi rekam medis; hanya status
+belum/sedang/selesai diperiksa.
+M
+P5.
+FD-07
+Antrian cetak: surat sakit dan rujukan dari dokter muncul;
+resepsionis mencetak, status berganti PRINTED lalu
+HANDED_TO_PATIENT.
+M
+Menutup celah surat tidak
+terserah-terimakan.
+FD-08
+Keluhan awal (bukan diagnosis) dicatat saat pendaftaran
+sebagai teks bebas.
+S
+Diteruskan ke perawat/dokter.
+FD-09
+Pasien pulang: Visit CLOSED bila semua Order dan Invoice final;
+reminder kontrol/sesi lanjutan/imunisasi otomatis dijadwalkan.
+M
+Retensi pasien.
+FD-10
+Reschedule dan cancel wajib beralasan; setiap perubahan slot
+tercatat di audit log; no-show tercatat sebagai status.
+M
+RL-19.
+FD-11
+Identitas pasien di layar front desk dapat dimasking pada bagian
+yang tidak diperlukan.
+C
+Minimalkan paparan data.
+9. Modul Perawat / Asisten Medis (Intake)
+KERANGKA BERPIKIR
+Perawat adalah asisten dokter. Ia menyiapkan data agar dokter langsung bekerja klinis saat pasien tiba. Garis
+batas medikolegal: perawat membantu, tanggung jawab diagnosis di dokter. Karena itu perawat menambah data
+dan tidak dapat menyunting entri dokter, dan sistem menegakkannya secara teknis, bukan sekadar SOP lisan.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+NR-01
+Daftar pasien yang menunggu intake (per poli/dokter) dengan
+urutan antrian.
+M
+Sumber: antrian front desk.
+NR-02
+Input vital yang configurable per poli: BB, TB, suhu, tekanan
+darah, nadi, RR, SpO2; lingkar kepala untuk bayi (opsional).
+M
+Tidak semua pasien/poli butuh semua
+parameter.
+NR-03
+Validasi rentang sebagai peringatan lunak (bukan pemblokiran),
+rentang mengikuti usia pasien.
+M
+Salah ketik (mis. suhu 380) tertangkap.
+NR-04
+Alergi (obat dan lain) tersimpan di level pasien, ditampilkan
+menonjol di header, dan diverifikasi ulang tiap kunjungan
+(sumber: penuturan pasien).
+M
+Basis peringatan alergi dokter dan
+farmasi.
+NR-05
+Keluhan saat ini sebagai teks bebas.
+M
+Tampil di workspace dokter.
+NR-06
+Perawat hanya dapat menambah/mengoreksi data intake
+miliknya (dengan versi); tidak dapat menyunting anamnesis,
+diagnosis, atau entri dokter.
+M
+Percobaan ditolak dan tercatat.
+NR-07
+Begitu intake disimpan, data langsung muncul di workspace
+dokter (push, tanpa muat ulang manual) dan masuk RM
+kunjungan.
+M
+Visit = INTAKE_DONE.
+NR-08
+Checklist kesiapan alat steril dan status kesiapan ruang tindakan.
+M
+Terhubung ke jadwal maintenance alat
+(Bagian 14).
+NR-09
+Penanda visual pada antrian bila vital di luar rentang (mis.
+demam tinggi) untuk membantu prioritas.
+S
+Bantuan triase, bukan keputusan klinis.
+
+===== PAGE 16 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 16
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+NR-10
+Untuk pasien anak, BB/TB/lingkar kepala juga menulis ke
+GrowthMeasurement.
+M
+Sekali input, dipakai growth chart.
+10. Modul Dokter (Umum dan Spesialis Anak)
+KERANGKA BERPIKIR
+Prinsip inti: dokter bekerja secara klinis, sistem bekerja secara administratif. Alur yang diminta pemilik:
+dokter melihat antrian khusus untuknya, data vital dari perawat sudah ada di rekam medis saat pasien dipanggil,
+dokter tinggal anamnesis dan diagnosis, lalu menekan tombol tindakan yang otomatis terkirim ke divisi tujuan.
+Resep ditulis di 'lembar kosong' tanpa dibatasi template.
+10.1 Terima pasien dan workspace klinis
+Status antrian dokter: WAITING, CALLED, ACCEPTED/IN_SERVICE, COMPLETED. Saat dokter menekan
+[Terima Pasien], sistem mengunci konteks kunjungan (Visit ID, Patient ID, Doctor ID, poli, waktu, nomor
+antrian). Setelah itu semua aksi otomatis menempel pada konteks ini sehingga dokter tidak perlu mencari pasien
+lagi dan tidak dapat salah membuka rekam medis pasien lain.
++---------------------------------------------------------------+
+| Budi Santoso   L/35   RM: 001234        ALERGI: PENICILLIN (!)  |
++---------------------------------------------------------------+
+| Vital : BB 72 kg | TB 170 cm | TD 130/85 | Suhu 38.2 C          |
+| Keluhan awal (perawat): Demam 2 hari, batuk, pilek             |
++---------------------------------------------------------------+
+| ANAMNESIS            [ teks bebas ]                            |
+| PEMERIKSAAN          [ teks bebas ]                            |
+| ASSESSMENT/DIAGNOSIS [ teks bebas + kode ICD (opsional) ]      |
+| CATATAN              [ teks bebas ]                            |
++---------------------------------------------------------------+
+| [RESEP] [RUJUKAN] [SURAT SAKIT] [TINDAKAN]                     |
+|                                     [SELESAIKAN KUNJUNGAN]     |
++---------------------------------------------------------------+
+Workspace adalah satu layar kerja, bukan formulir panjang bertahap. Riwayat kunjungan sebelumnya dapat
+dibuka sebagai panel samping tanpa meninggalkan layar.
+10.2 Tindakan sebagai Order dengan tujuan divisi
+Setiap tindak lanjut dokter adalah sebuah Order yang selalu terhubung ke Visit. Dokter tidak perlu mengetahui
+alur internal divisi; ia hanya membuat Order dan sistem menentukan tujuan.
+Order
+Tujuan divisi
+Status siklus hidup
+Resep
+Farmasi
+DRAFT, SIGNED, SENT_TO_PHARMACY, RECEIVED, VERIFIED,
+PROCESSING, READY, DISPENSED (atau
+RETURNED_TO_DOCTOR, PARTIAL, NOT_COLLECTED)
+Surat sakit
+Front desk (cetak)
+DRAFT, SIGNED, SENT_TO_RECEPTION, PRINTED,
+HANDED_TO_PATIENT
+Rujukan
+Front desk / meja rujukan
+DRAFT, SIGNED, SENT_TO_RECEPTION, PRINTED,
+HANDED_TO_PATIENT
+Tindakan lain
+Unit tindakan / kasir untuk
+penagihan
+ORDERED, DONE, BILLED
+Order lain
+(lab/radiologi)
+Belum dibahas
+Rancang sebagai jenis Order yang dapat ditambah tanpa mengubah
+inti.
+
+===== PAGE 17 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 17
+KERANGKA BERPIKIR
+Konsep Order generik membuat penambahan divisi baru (mis. laboratorium) hanya menambah jenis dan tujuan,
+bukan menulis ulang alur. Status pada tiap Order juga menghidupkan kontrol operasional: misalnya surat rujukan
+yang dibuat 14:05 tetapi belum dicetak pukul 14:20 dapat ditandai (RL-16). Dokter tidak perlu melihat seluruh
+status; owner dan manajer dapat melihatnya.
+10.3 Lembar resep kosong (Prescription Pad)
+Keinginan pemilik: dokter tidak merasa dibatasi template. Dokter mendapat lembar resep elektronik kosong
+yang dapat ditulisi apa saja seperti kertas resep. Satu-satunya pengingat yang diminta adalah pilihan Iter 1 / Iter
+2 / Iter 3 atau Ne Iter.
+ATURAN BISNIS
+Tidak boleh ada kolom wajib (nama obat, dosis, dst.) yang harus diisi satu per satu, tidak boleh ada dropdown
+wajib, dan tidak boleh ada template yang memaksa dokter menyesuaikan cara berpikirnya. Sistem membantu
+(autocomplete, peringatan) tetapi tidak menghalangi dokter menulis apa pun, termasuk obat yang belum ada di
+master.
+Dua representasi wajib: (A) Clinical Prescription Object: data terstruktur di basis data; (B) Prescription
+Document: dokumen resmi yang dirender dari data tersebut. Aturan paling penting: dokumen resmi
+menampilkan tulisan dokter apa adanya; hasil parsing hanyalah alat bantu untuk farmasi, stok, tagihan, dan
+pemeriksaan keselamatan.
+10.4 Alur pembacaan (parsing) teks bebas
+Pipeline di belakang layar, berjalan saat dokter mengetik dan sebelum kirim:
+
+Segmentasi: pisahkan per blok R/ (satu R/ dapat berisi satu obat atau satu racikan berisi beberapa bahan).
+
+Pencocokan obat: cocokkan nama (generik/merek/kekuatan) ke master Drug dengan toleransi salah ketik;
+hasilkan kandidat berperingkat.
+
+Ekstraksi: dosis per pemberian, frekuensi, jumlah total, rute, durasi, instruksi (mis. sesudah makan),
+memakai pola dan kamus singkatan resep (tabel di bawah).
+
+Deteksi racikan: beberapa bahan dalam satu R/ atau kata kunci seperti m.f., pulv., caps membentuk grup
+racik.
+
+Konversi dosis: bila dosis dalam mg dan sediaan dalam tablet/kapsul/ml, hitung jumlah unit (lihat 12.6) dan
+tandai bila pecahan tidak wajar.
+
+Status parse per baris: COCOK (satu obat jelas), AMBIGU (beberapa kandidat), TAK DIKENALI.
+
+Panel konfirmasi: sebelum kirim, tampilkan hasil bacaan (obat, dosis, jumlah) berdampingan dengan tulisan
+dokter; dokter cukup satu ketukan untuk mengonfirmasi atau memperbaiki.
+Input dokter (teks bebas)            Hasil bacaan sistem (panel konfirmasi)
+---------------------------------    -----------------------------------------------
+R/ Amoxicillin 500 mg                item 1: Amoxicillin 500 mg (COCOK)
+   3 dd 1                                    dosis 1 kapsul | 3 x sehari
+   No. XV                                    jumlah 15 (XV) | rute oral
+   sesudah makan                             instruksi: sesudah makan (p.c.)
+Iter 1                               iter  : Iter 1
+                                     alergi: cek terhadap alergi pasien -> OK
+ATURAN BISNIS
+Baris TAK DIKENALI atau AMBIGU tidak memblokir pengiriman. Baris ditandai dan dikirim apa adanya;
+farmasi menerima dengan penanda tersebut. Keselamatan dijaga oleh panel konfirmasi (dokter melihat hasil
+bacaan) dan verifikasi apoteker. Keputusan akhir tetap milik dokter.
+Kamus singkatan resep yang harus dikenali (dapat diperluas admin)
+
+===== PAGE 18 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 18
+Singkatan
+Arti
+Singkatan
+Arti
+R/
+Recipe (mulai obat)
+prn / p.r.n.
+pro re nata (bila perlu)
+S / signa
+Aturan pakai
+m.f. / m.f.l.a.
+misce fac (campur dan buat) / lege artis
+dd
+Per hari (3 dd = 3 kali sehari)
+d.t.d.
+da tales doses (berikan dosis demikian)
+p.c.
+post cibum (sesudah makan)
+No. / #
+numero (jumlah); dapat angka Romawi,
+mis. XV = 15
+a.c.
+ante cibum (sebelum makan)
+det / detur
+diserahkan
+d.c.
+durante cibum (saat makan)
+ne det / ne detur
+tidak diserahkan
+u.e. / u.i.
+usus externus (pemakaian luar) / usus
+internus (dalam)
+iter
+ulangi; diikuti angka, mis. iter 1
+u.c.
+usus cognitus (pemakaian sudah diketahui)
+tab, caps, syr, gtt,
+ung
+tablet, kapsul, sirup, tetes, salep
+Pola frekuensi bebas juga harus dikenali, misalnya 3x1, 3 x sehari, 2 dd 1/2, 1-0-1, serta pecahan (1/2, 1 1/2).
+10.5 Iterasi resep
+Pilihan iterasi: Ne Iter, Iter 1, Iter 2, Iter 3 (custom opsional). Dokter dapat mengetiknya di teks resep atau
+memilih tombol; keduanya menghasilkan nilai terstruktur iter_tipe dan iter_jumlah. Jangan menjadikan
+'Iter' sebagai satu-satunya info tersimpan: Prescription juga menyimpan ID resep, ID kunjungan, dokter, waktu
+dibuat, waktu tanda tangan, item obat, dan status.
+10.6 Peringatan alergi dan ketersediaan stok saat meresepkan
+
+Alergi: alergi pasien tampil menonjol di header. Bila obat yang diketik bentrok dengan agen alergi (termasuk
+kelas obat yang relevan), tampil peringatan lunak; dokter dapat melanjutkan dengan alasan tercatat. Apoteker
+melihat peringatan yang sama saat verifikasi.
+
+Stok: saat dokter mengetik nama obat, tampil status ketersediaan tersedia / menipis / kosong (hanya-baca).
+Bila kosong/menipis, sistem menyarankan alternatif dengan kandungan dan kekuatan setara. Substitusi tetap
+keputusan dokter, tidak pernah otomatis.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Status stok untuk dokter diusulkan kualitatif (bukan angka persis) agar keputusan medis tidak terdistorsi oleh
+sisa stok, dengan angka detail terbuka hanya bila dokter mengklik lanjutan. Pemilik belum mengonfirmasi tingkat
+detail ini; bangun sebagai pengaturan.
+10.7 Dokumen resep resmi dan otentikasi
+Resep yang terkirim ke farmasi berbentuk dokumen lengkap dengan kop resmi seperti resep fisik, tetapi
+elektronik. Bangun sebagai Prescription Document Template yang berversi dan dapat dikonfigurasi, bukan
+satu kop statis yang di-hard-code, karena persyaratan dapat berubah sesuai regulasi yang berlaku.
+Komponen dokumen
+Keterangan
+Identitas fasilitas
+Logo, nama klinik, alamat, kontak, dan identitas perizinan sesuai ketentuan yang berlaku.
+Identitas dokter
+Nama, nomor SIP (dan identitas lain yang disyaratkan).
+Identitas pasien
+Nama, no RM, umur/tanggal lahir, jenis kelamin; untuk pasien anak sebaiknya juga BB.
+Metadata resep
+Nomor resep unik, tanggal, iter.
+Isi resep
+Blok R/ sesuai tulisan dokter (nama obat, kekuatan, signa, jumlah).
+Otentikasi
+Tanda tangan elektronik / mekanisme otentikasi dokter (mis. re-autentikasi saat kirim),
+stempel waktu, hash dokumen.
+
+===== PAGE 19 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 19
+Komponen dokumen
+Keterangan
+Kode verifikasi (S)
+QR/kode untuk verifikasi keaslian dokumen oleh farmasi.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Kesesuaian format kop, bentuk tanda tangan elektronik, dan ketentuan khusus resep narkotika/psikotropika
+dengan regulasi BPOM, Kemenkes/Dinkes setempat, dan ketentuan rekam medis elektronik belum diverifikasi.
+Tim wajib menyusun spesifikasi kepatuhan terpisah dan memverifikasinya sebelum go-live. Sementara itu,
+template harus mudah diubah tanpa deploy ulang.
+10.8 Pengembalian dari farmasi
+Bila farmasi menemukan baris yang tidak jelas atau obat tidak tersedia, resep berstatus
+RETURNED_TO_DOCTOR. Dokter menerima notifikasi, membuat versi baru resep (versi lama tetap
+tersimpan), lalu mengirim ulang.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Rekomendasi: farmasis tidak mengoreksi isi resep sendiri; hanya menandai tidak tersedia/ambigu lalu
+mengembalikan ke dokter (konsisten dengan batasan farmasi tidak mengubah resep dan aspek medikolegal).
+Pemilik belum menjawab pertanyaan ini. Konfirmasi sebelum diimplementasikan.
+10.9 Tabel kebutuhan modul dokter
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+DR-01
+Dokter hanya melihat antrian pasien yang ditujukan kepadanya.
+M
+Antrian khusus dokter target.
+DR-02
+Tombol Terima Pasien: mengubah status ke IN_SERVICE dan
+mengunci konteks kunjungan. Default satu pasien aktif per
+dokter; configurable.
+M
+Cegah salah buka RM.
+DR-03
+Workspace tunggal: header pasien (nama, umur, JK, no RM,
+alergi menonjol), vital, keluhan awal, anamnesis, pemeriksaan,
+assessment/diagnosis, catatan.
+M
+Dokter fokus ke pasien.
+DR-04
+Simpan draf otomatis berkala; tidak ada kehilangan input saat
+koneksi terputus.
+M
+Catatan klinis tidak boleh hilang.
+DR-05
+Diagnosis berupa teks dan kode ICD yang dapat dicari
+(opsional).
+S
+Pelaporan dan analitik.
+DR-06
+Nama dan nomor RM di semua tampilan lintas modul dapat diklik
+menuju rekam medis (sesuai izin).
+M
+Akses cepat.
+DR-07
+Tombol tindakan: Resep, Rujukan, Surat sakit, Tindakan;
+extensible untuk jenis Order lain.
+M
+10.2.
+DR-08
+Setiap tindakan menjadi Order dengan tujuan dan status; routing
+otomatis; dokter tidak memilih alur internal.
+M
+Prinsip P1.
+DR-09
+Selesaikan Kunjungan: validasi minimal (diagnosis terisi, draft
+belum terkirim dikonfirmasi); Visit menjadi COMPLETED dan
+memicu penagihan tindakan.
+M
+Titik awal rekonsiliasi kasir.
+DR-10
+Lembar resep kosong berteks bebas; tanpa kolom wajib, tanpa
+dropdown wajib.
+M
+Keinginan utama pemilik.
+DR-11
+Autocomplete obat saat mengetik dan status stok kualitatif; saran
+alternatif setara.
+M
+10.6.
+DR-12
+Parsing di belakang layar dan panel konfirmasi; baris tak
+dikenali/ambigu tidak memblokir.
+M
+10.4.
+
+===== PAGE 20 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 20
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+DR-13
+Peringatan alergi lunak dengan override beralasan tercatat.
+M
+P10.
+DR-14
+Pilihan Ne Iter / Iter 1 / 2 / 3 (custom opsional); tidak ada field
+wajib lain.
+M
+10.5.
+DR-15
+Tanda tangan/otentikasi elektronik saat kirim; resep SIGNED
+imutabel; koreksi = versi baru dengan jejak.
+M
+Bukti medikolegal.
+DR-16
+Render dokumen resep resmi dari template berversi (10.7).
+M
+Farmasi menerima seperti resep fisik.
+DR-17
+Kirim resep membuat Order menuju antrian farmasi (idempoten);
+dokter melihat status resep hanya-baca.
+M
+5.2 butir 5.
+DR-18
+Pengembalian dari farmasi menjadi notifikasi ke dokter; revisi
+membuat versi baru.
+M
+10.8.
+DR-19
+Surat sakit dan rujukan: dibuat dari template dengan identitas
+dan diagnosis terisi otomatis, dirender sebagai dokumen resmi,
+dikirim ke antrian cetak resepsionis.
+M
+FD-07.
+DR-20
+Salin resep sebelumnya (repeat) untuk pasien kontrol.
+S
+Efisiensi.
+DR-21
+Pemeriksaan dosis berbasis BB anak (mg/kg) sebagai
+peringatan lunak.
+C
+Klinik anak; memakai BB dari intake.
+DR-22
+Resep narkotika/psikotropika ditandai khusus, akses terbatas,
+mengikuti syarat regulasi yang diverifikasi.
+M
+Bagian 12.7.
+DR-23
+Dokter tidak melihat harga pokok atau margin.
+M
+Matriks akses.
+DR-24
+Permintaan pengadaan obat ke farmasi lewat Memo terarah
+yang tertaut ke modul defecta.
+S
+Bagian 15.
+11. Kekhususan Dokter Gigi dan Dokter Anak
+11.1 Dokter gigi: odontogram dan rencana perawatan multi-sesi
+KERANGKA BERPIKIR
+Perawatan gigi sering berlangsung multi-sesi dan lintas tahun. Tanpa sistem yang menyimpan rencana
+perawatan dengan jelas, muncul dua jenis kebocoran: sesi yang dikerjakan tetapi tidak tertagih (dianggap
+'termasuk paket sebelumnya'), atau pasien membayar dua kali untuk sesi yang sudah termasuk paket. Modul ini
+terpisah dari RM umum secara tampilan tetapi terhubung lewat Patient ID, bukan menduplikasi data pasien.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+GG-01
+Odontogram interaktif dengan notasi FDI (gigi permanen dan
+sulung), status per gigi dan per permukaan, riwayat perubahan
+berversi.
+M
+Peta kondisi gigi.
+GG-02
+Rencana perawatan: item (gigi, tindakan, estimasi biaya, sesi
+ke-n, status direncanakan/selesai/batal).
+M
+Multi-sesi.
+GG-03
+Dukungan paket perawatan: harga paket, sesi terpakai, sisa sesi.
+M
+Cegah tagih ganda dan sesi terlewat.
+GG-04
+Tindakan yang dikerjakan pada kunjungan otomatis menjadi item
+tagihan tepat satu kali; rekonsiliasi antara tindakan tercatat dan
+tertagih (RL-07).
+M
+Kontrol kebocoran.
+GG-05
+Jadwal sesi lanjutan otomatis diusulkan dan dapat langsung
+membuat reservasi.
+S
+Kontinuitas perawatan.
+GG-06
+Kasir hanya melihat estimasi biaya dan status sesi untuk
+penagihan, bukan isi klinis.
+M
+Matriks akses.
+
+===== PAGE 21 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 21
+11.2 Dokter anak: tumbuh kembang dan imunisasi
+KERANGKA BERPIKIR
+Reminder imunisasi otomatis mengurangi beban follow-up manual front desk sekaligus menjadi nilai jual klinik
+bagi orang tua (retensi). Tanpa growth chart otomatis, dokter menghitung persentil manual tiap kunjungan:
+memakan waktu dan rawan salah.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+AN-01
+Growth chart otomatis (BB/U, TB/U, BB/TB, IMT/U, lingkar
+kepala/U) dengan persentil/z-score sesuai standar WHO/rujukan
+Kemenkes yang ditetapkan klinis; sumber data referensi dapat
+diganti.
+M
+Perhitungan dari BB/TB/LK intake.
+Verifikasi referensi dengan pihak klinis.
+AN-02
+Jadwal imunisasi berbasis usia yang configurable (sesuai
+rekomendasi yang berlaku), pencatatan vaksin yang diberikan,
+dan kartu vaksinasi digital.
+M
+Referensi jadwal diverifikasi klinis;
+terhubung ke status batch vaksin
+(12.12).
+AN-03
+Reminder imunisasi dan kontrol otomatis dikirim ke wali
+(WA/SMS).
+M
+Terhubung akun keluarga.
+AN-04
+Data tumbuh kembang terhubung ke profil wali dan riwayat
+kunjungan anak.
+M
+Akun keluarga.
+AN-05
+Tren pertumbuhan dan deviasi ditandai untuk perhatian dokter.
+S
+Bantuan klinis.
+
+===== PAGE 22 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 22
+12. Modul Farmasi (Instalasi Farmasi / Apotek)
+KERANGKA BERPIKIR
+Farmasi adalah titik pertemuan tiga risiko: keselamatan pasien (obat salah/kadaluarsa), kepatuhan regulasi
+(narkotika/psikotropika, retensi resep), dan kebocoran finansial (stok hilang, harga dimainkan, obat keluar tanpa
+tagihan). Karena itu seluruh alur dirancang berbasis ledger stok yang append-only, harga dari master, dan
+setiap obat keluar selalu punya resep/transaksi dan tagihan. Keputusan pemilik: tidak ada pekerjaan
+farmasi yang dikerjakan di luar sistem.
+Rantai pekerjaan farmasis yang harus dicakup: Pengadaan (defecta, surat pesanan, multi-supplier), Pencatatan
+(faktur pembelian, kartu stok), Pelaporan (narkotika/psikotropika), Pengarsipan (faktur, resep), Pelayanan
+resep (racikan/non-racikan, internal/eksternal, e-resep/resep fisik, ditebus sebagian/tidak ditebus, salinan resep,
+PIO, cek keamanan obat, akses rekam medis), Harga, Etiket, Kontrabon, Vaksin, Pemusnahan, dan
+Penjualan bebas (OTC).
+12.1 Master data obat
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-01
+Satu master Drug untuk obat jadi dan bahan racik. Stok bahan
+racik dan obat jadi disatukan (tidak dipisah).
+M
+Ketentuan pemilik: hindari input ganda.
+FA-02
+Atribut: nama dagang, generik, kekuatan, bentuk sediaan, satuan
+terkecil, satuan konversi (box, strip, tablet), golongan (bebas,
+bebas terbatas, keras, OKT, narkotika, psikotropika, prekursor),
+rute (dalam/luar), kategori etiket, reorder point, supplier utama,
+harga beli referensi, penanda is_vaksin, kategori BUD.
+M
+Golongan menentukan SP, SIPNAP,
+retensi, jalur OTC (12.15); rute
+menentukan etiket; is_vaksin
+menentukan alur 12.12.
+FA-03
+Perubahan master berversi dan tercatat di audit log; dukung
+impor massal (CSV).
+M
+Migrasi awal dan kontrol.
+FA-04
+Alias nama (merek, ejaan umum) untuk membantu pencocokan
+parsing resep dan pencarian.
+S
+Akurasi 10.4.
+12.2 Pengadaan: defecta dan Surat Pesanan (SP)
+Alur: kartu stok menyentuh titik minimum, defecta terbentuk, SP dibuat dari defecta (dengan supplier yang dipilih,
+lihat 12.16), disetujui apoteker, dikirim ke PBF/distributor, barang datang bersama faktur.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-10
+Defecta otomatis terbentuk saat saldo lebih kecil atau sama
+dengan reorder point; defecta manual diperbolehkan dengan
+alasan.
+M
+Cegah kekosongan obat esensial tanpa
+mengandalkan ingatan.
+FA-11
+SP dibuat dari defecta; asisten dapat membuat draft, hanya
+apoteker yang menyetujui.
+M
+P7; cegah over-order dan order fiktif.
+FA-12
+SP dibedakan otomatis berdasarkan golongan item: reguler dan
+khusus (narkotika, psikotropika, prekursor), masing-masing
+dengan template dan nomor urut terpisah, ditandatangani
+apoteker penanggung jawab.
+M
+Ketentuan regulasi; format diverifikasi
+(Bagian 16).
+FA-13
+Status SP: DRAFT, APPROVED, SENT,
+PARTIALLY_RECEIVED, CLOSED.
+M
+Basis cross-check faktur.
+FA-14
+Permintaan pengadaan dari dokter (memo) dapat menjadi
+sumber defecta manual dengan tautan.
+S
+Bagian 15.
+12.3 Penerimaan faktur dan kartu stok
+
+===== PAGE 23 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 23
+KETENTUAN FINAL
+Kartu stok bersifat built-in penuh. Saldo item adalah hasil penjumlahan mutasi (masuk, keluar resep, keluar
+OTC, retur, rusak, kadaluarsa, opname, pemusnahan). Tidak ada layar untuk mengedit angka saldo secara
+langsung; koreksi hanya melalui mutasi berjenis OPNAME/KOREKSI dengan alasan dan approval.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-20
+Input faktur pembelian: supplier, nomor, tanggal, tanggal jatuh
+tempo (wajib), dan per baris: obat, no batch dan ED (wajib),
+jumlah, harga beli, diskon.
+M
+Batch/ED dasar FEFO, alert ED, dan
+telusur recall BPOM.
+FA-21
+Cross-check otomatis faktur terhadap SP (jumlah dipesan vs
+diterima, harga); selisih di-flag, bukan menunggu opname.
+M
+Kontrol pengadaan.
+FA-22
+Verifikasi fisik lalu posting; posting membuat StockMovement IN
+per batch secara atomik, menyimpan cost_unit dari harga faktur,
+dan memperbarui kartu stok.
+M
+5.2 butir 1; dasar FIFO cost (12.17).
+FA-23
+Kartu stok per item dan per batch dengan saldo berjalan
+real-time untuk setiap jenis mutasi.
+M
+Basis opname valid.
+FA-24
+Pengeluaran default memakai FEFO (first expired first out); cost
+yang dicatat pada mutasi keluar mengikuti batch yang keluar
+(lihat 12.17).
+M
+Kurangi obat terbuang; konsisten fisik
+dan pembukuan.
+FA-25
+Retur ke supplier dan penghapusan (rusak/ED) memerlukan
+alasan dan persetujuan apoteker.
+M
+Kontrol kebocoran barang.
+FA-26
+Stok opname periodik: input hitung fisik, pencocokan otomatis
+dengan sistem, selisih menjadi mutasi OPNAME dengan alasan.
+M
+RL-09.
+FA-27
+Peringatan batch mendekati ED bertingkat (lihat 12.14) dan
+batch sudah ED yang belum dihapus.
+M
+RL-10.
+FA-28
+Saldo negatif tidak diperbolehkan secara default; upaya
+melampaui saldo diblok/diperingatkan.
+M
+Integritas stok.
+FA-29
+Dukungan pemindai barcode untuk penerimaan barang dan
+opname.
+C
+Efisiensi.
+12.4 Harga jual, diskon, dan komponen biaya
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Dari faktur, farmasis dapat menyeting harga jual dan harga diskon (untuk keluarga atau karyawan, dalam
+persentase atau nominal), serta komponen biaya tambahan saat dispensing: kemasan dan embalase resep.
+Pembayaran seluruh komponen diproses di kasir farmasi.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-30
+Setelah faktur diposting, sistem mengusulkan harga jual = harga
+beli + aturan margin (per kategori, configurable). Apoteker
+mengatur dalam batas kebijakan owner; di luar batas
+memerlukan persetujuan owner.
+M
+Harga tidak diketik ulang tiap faktur;
+kontrol margin.
+FA-31
+Perubahan harga berversi dengan tanggal berlaku; setiap
+transaksi menyimpan snapshot harga.
+M
+Histori tidak berubah retroaktif.
+FA-32
+Diskon berbasis kelompok pasien (umum, keluarga, karyawan)
+dengan aturan persen atau nominal, diterapkan otomatis;
+tercatat jelas di struk dan laporan (siapa, aturan apa).
+M
+Kasir tidak mengetik diskon bebas.
+
+===== PAGE 24 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 24
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-33
+Komponen dispensing (kemasan: pot salep, plastik klip, botol
+racikan, dan sejenisnya; embalase resep) sebagai master
+bernilai standar per jenis resep (racikan/non-racikan), muncul
+sebagai baris tagihan terpisah.
+M
+Tidak digabung diam-diam ke harga
+obat.
+FA-34
+Harga jual di bawah harga beli atau margin di bawah minimum
+diblok atau memerlukan persetujuan.
+M
+RL-15.
+FA-35
+Tagihan farmasi terbentuk otomatis dari resep yang diproses;
+dibayar di titik kasir farmasi.
+M
+Bagian 13.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Nilai margin standar, ambang margin minimum, dan nilai standar kemasan/embalase belum ditentukan pemilik.
+Sediakan sebagai konfigurasi; nilai awal ditetapkan pemilik saat implementasi.
+12.5 Pelayanan resep
+Sumber resep
+
+Internal (dokter klinik): e-resep masuk otomatis ke antrian farmasi, lengkap dengan kop resmi, seperti resep
+fisik.
+
+Eksternal (dokter luar): resep fisik. Apoteker menginput sebagai resep eksternal, memfoto/scan resep fisik
+dan menautkannya ke transaksi, lalu memverifikasi keabsahan dan kelengkapan.
+Alur pelayanan
+Resep masuk -> Telaah (administratif, farmasetik, klinis) -> VERIFIED
+   -> [Non-racik] ambil obat (FEFO)      atau   [Racik] antrian racik + checklist
+   -> Konversi dosis & flag pecahan ganjil -> Hitung BUD (racikan) -> Etiket otomatis -> PIO (opsional)
+   -> Penyerahan (DISPENSED / PARTIAL / NOT_COLLECTED)
+   -> Stok berkurang (atomik, cost FIFO) + baris tagihan terbentuk -> Bayar di kasir farmasi
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-40
+Setiap resep masuk menampilkan nama dan nomor rekam
+medis pasien yang dapat diklik langsung membuka riwayat
+alergi dan obat rutin tanpa pindah modul atau mengetik ulang.
+M
+Ketentuan pemilik.
+FA-41
+Resep eksternal: input manual + scan/foto resep fisik tertaut ke
+transaksi; nomor resep internal dibuat otomatis.
+M
+Arsip dan audit.
+FA-42
+Telaah resep (administratif, farmasetik, klinis) tercatat sebagai
+langkah verifikasi menuju status VERIFIED. Rincian butir telaah
+mengikuti SOP klinik.
+M
+Praktik pelayanan kefarmasian; butir
+rinci diverifikasi.
+FA-43
+Non-racikan: verifikasi, ambil obat (FEFO), etiket, serahkan.
+M
+Alur pendek.
+FA-44
+Racikan: masuk antrian racik; bahan turun dari stok master
+tunggal; checklist double-check sebelum serah; etiket
+mencantumkan komposisi/aturan pakai hasil racikan dan BUD
+(12.13).
+M
+Risiko kesalahan dosis lebih tinggi.
+FA-45
+Konversi dosis otomatis dari mg (atau satuan lain) ke unit
+sediaan (12.6), dengan flag pecahan tidak wajar.
+M
+Ketentuan pemilik.
+FA-46
+Status tebus per item: penuh, sebagian, tidak ditebus. Sisa
+dihitung otomatis. Resep tidak ditebus tetap tercatat
+(NOT_COLLECTED).
+M
+Audit kepatuhan pasien dan evaluasi
+peresepan.
+FA-47
+Salinan resep: cetak dengan sisa obat. Apoteker juga dapat
+memilih menampilkan resep as is dengan keterangan det/detur,
+ne det/ne detur, dan iter yang diikuti angka merujuk resep asli.
+M
+Ketentuan pemilik; sisa otomatis, notasi
+resmi opsional manual.
+
+===== PAGE 25 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 25
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-48
+PIO tercatat sebagai bagian transaksi namun opsional; tidak
+memblokir alur bila tidak diisi. Disediakan checklist singkat isi
+PIO (cara pakai, efek samping utama, interaksi).
+M
+Ketentuan pemilik.
+FA-49
+Cek keamanan obat: riwayat alergi/obat rutin dari RM; interaksi
+via database internal atau tautan cepat ke referensi eksternal
+(mis. Medscape) yang membawa nama generik otomatis, tanpa
+mengetik ulang.
+M
+Efisiensi saat antrian ramai.
+FA-50
+Kembalikan resep ke dokter (RETURNED_TO_DOCTOR) untuk
+baris ambigu/tidak tersedia; farmasis tidak mengoreksi isi resep.
+M
+10.8 (asumsi).
+FA-51
+Dispensing menurunkan stok dan membuat baris tagihan dalam
+satu transaksi atomik; mencatat siapa dan kapan menyerahkan.
+M
+Tidak ada obat keluar tanpa tagihan.
+FA-52
+Resep DISPENSED tanpa baris tagihan farmasi tidak mungkin
+terjadi; bila terdeteksi menjadi anomali.
+M
+RL-08.
+12.6 Konversi dosis otomatis dan flag pecahan ganjil
+KERANGKA BERPIKIR
+Dokter sering menuliskan kebutuhan dalam mg (terutama pada anak, berbasis berat badan), sedangkan farmasi
+memberikan tablet/kapsul/ml. Perhitungan manual memakan waktu dan rawan salah. Hasil konversi yang tidak
+masuk akal (mis. 7,25 tablet) adalah sinyal kuat salah hitung dosis atau salah pencatatan, sehingga harus
+memicu flag otomatis.
+Rumus: unit_per_dosis = dosis_dibutuhkan / kekuatan_per_unit; total_unit =
+unit_per_dosis x frekuensi_per_hari x durasi (atau jumlah yang diresepkan bila tertulis). Kekuatan
+berasal dari master Drug (mis. tablet 500 mg; sirup 125 mg per 5 ml).
+Aturan kewajaran: hasil unit_per_dosis harus kelipatan dari langkah pecahan yang dikonfigurasi per bentuk
+sediaan. Nilai awal usulan: tablet = 0,5 (0,25 untuk tablet bergaris/skoring bila diizinkan); kapsul = 1 (tidak dapat
+dibagi); sirup/tetes = kelipatan 0,5 ml atau sesuai alat ukur; puyer = fleksibel per bungkus.
+Kasus
+Perhitungan
+Hasil
+Dosis 250 mg; tablet 500 mg
+250 / 500 = 0,5 tablet
+Wajar (setengah tablet). Etiket menuliskan 1/2
+tablet.
+Dosis 150 mg; sirup 125 mg/5 ml
+150 / 125 x 5 = 6 ml
+Wajar (kelipatan 0,5 ml).
+Dosis 362,5 mg; tablet 50 mg
+362,5 / 50 = 7,25 tablet
+FLAG pecahan ganjil: tampilkan angka hitung;
+pilihan: kembalikan ke dokter atau lanjutkan
+dengan alasan tercatat.
+Dosis 100 mg; kapsul 250 mg
+100 / 250 = 0,4 kapsul
+FLAG: kapsul tidak dapat dibagi.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Konversi otomatis dari mg (atau satuan lain) ke jumlah unit sediaan berdasarkan master obat; farmasis tidak
+menghitung manual. Flag pecahan ganjil berjalan berdampingan (mis. kebutuhan yang terkonversi menjadi 7,25
+tablet). Stok bahan racik dan obat jadi satu.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Sisa fraksi pada racikan (mis. 7,25 tablet digerus) belum diputuskan pemilik. Usulan: pengurangan stok
+dibulatkan ke atas ke unit fisik yang dibuka, selisih fraksi dicatat sebagai susut racik yang dapat dilaporkan; opsi
+lanjutan: sisa dipakai racikan berikutnya. Bangun sebagai pengaturan.
+12.7 Narkotika dan psikotropika, pelaporan SIPNAP
+
+===== PAGE 26 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 26
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-60
+Golongan narkotika/psikotropika/prekursor ditandai di master dan
+ter-flag di seluruh alur (stok, resep, laporan).
+M
+Aturan lebih ketat.
+FA-61
+Akses stok, resep, dan laporan golongan ini dibatasi staf yang
+ditunjuk eksplisit.
+M
+Matriks akses.
+FA-62
+Setiap mutasi keluar golongan ini wajib menaut ke
+resep/dispensing; keluar tanpa resep tidak dapat dicatat;
+golongan ini juga tidak dapat muncul di jalur OTC (12.15).
+M
+RL-14.
+FA-63
+Rekap bulanan penggunaan (pemasukan, pengeluaran, saldo
+per item) tersusun otomatis dari transaksi dalam format yang
+diterima SIPNAP.
+M
+Ketentuan pemilik: SIPNAP built-in,
+bukan rekap manual.
+FA-64
+Arsip laporan dan riwayat pelaporan tersimpan; pengingat batas
+waktu pelaporan.
+M
+Kepatuhan.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Bila portal SIPNAP tidak menyediakan integrasi langsung, sistem harus tetap menghasilkan data siap lapor
+dalam format yang diterima, sehingga farmasis tidak merekap manual. Tim perlu menelusuri kemungkinan
+integrasi dan spesifikasi terbaru sebelum implementasi.
+12.8 Pengarsipan dan retensi
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-70
+E-resep otomatis menjadi arsip digital; resep fisik discan dan
+tertaut ke transaksi.
+M
+Penelusuran cepat saat audit.
+FA-71
+Faktur pembelian: scan/foto faktur fisik tertaut ke
+SupplierInvoice.
+M
+Arsip faktur.
+FA-72
+Kategori retensi otomatis berdasarkan golongan obat dan jenis
+dokumen; lama retensi berupa parameter konfigurasi yang
+diverifikasi terhadap regulasi berlaku, tidak di-hard-code.
+M
+P8.
+FA-73
+Pencarian arsip berdasarkan nama pasien, tanggal, nomor
+resep, nomor faktur, supplier.
+M
+Efisiensi audit.
+FA-74
+Penghapusan arsip tidak tersedia bagi pengguna biasa; setelah
+masa retensi hanya melalui prosedur administrator yang tercatat.
+M
+P6.
+12.9 Pencetakan etiket
+KERANGKA BERPIKIR
+Etiket menempel langsung pada kemasan obat yang dibawa pasien; kesalahan di titik ini berdampak langsung
+pada keselamatan pasien. Karena itu etiket dicetak otomatis dari data resep yang sudah diverifikasi, bukan diketik
+ulang atau ditulis tangan.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-80
+Etiket dicetak otomatis dari data resep saat pelayanan selesai
+diverifikasi, tanpa input ulang manual.
+M
+Ketentuan pemilik (fitur terpenting).
+FA-81
+Isi minimal: nama pasien, tanggal, nama obat dan kekuatan,
+aturan pakai, jumlah, nomor resep, identitas klinik/apotek;
+racikan mencantumkan komposisi/aturan pakai hasil racikan,
+BUD, dan instruksi penyimpanan (12.13).
+M
+Standar etiket obat.
+
+===== PAGE 27 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 27
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-82
+Pembedaan etiket putih untuk obat dalam (oral) dan etiket biru
+untuk obat luar, ditentukan otomatis dari rute pada master obat.
+M
+Konvensi kefarmasian.
+FA-83
+Cetak ulang diperbolehkan tetapi tercatat (kapan, siapa, alasan).
+M
+Kontrol.
+FA-84
+Tidak ada jalur 'etiket kosong ditulis manual' dalam alur normal.
+M
+Cegah salah tulis/dengar.
+FA-85
+Kalimat peringatan tambahan per obat (mis. kocok dahulu,
+dihabiskan) dapat dikonfigurasi pada master.
+S
+Edukasi pasien.
+12.10 Notifikasi jatuh tempo faktur dan kontrabon
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Sistem memberi notifikasi otomatis H-7 sebelum tanggal jatuh tempo setiap faktur, dan faktur otomatis masuk
+ke daftar proses kontrabon. Karena kontrabon dan pembayaran ke distributor/PBF hanya berjalan pada hari
+tertentu, sistem menampilkan hari pembayaran terdekat untuk tiap faktur sehingga jelas kapan faktur diproses
+dan dibayar.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-90
+Tanggal jatuh tempo wajib pada setiap faktur pembelian.
+M
+Basis pengingat.
+FA-91
+Notifikasi otomatis H-7 (jumlah hari configurable) kepada
+apoteker penanggung jawab dan bagian keuangan.
+M
+Ketentuan pemilik.
+FA-92
+Faktur yang memasuki H-7 otomatis masuk ke daftar proses
+kontrabon.
+M
+Tidak tercecer.
+FA-93
+Konfigurasi hari kontrabon dan hari pembayaran (mis. hari
+tertentu per minggu/bulan, dapat per supplier). Sistem
+menghitung hari pembayaran terdekat yang jatuh pada atau
+sebelum jatuh tempo dan mengelompokkan faktur ke sesi
+tersebut.
+M
+Faktur tidak dianggap telat hanya
+karena bukan hari bayar.
+FA-94
+Bila hari pembayaran terdekat justru jatuh setelah jatuh tempo,
+tampil peringatan dan usulan hari bayar lebih awal.
+M
+Edge case penting: hindari
+keterlambatan.
+FA-95
+Dokumen kontrabon (nomor, daftar faktur, total, tanggal) dan
+status: IN_KONTRABON, SCHEDULED, PAID.
+M
+Pencatatan formal.
+FA-96
+Faktur lunas otomatis keluar dari daftar kontrabon aktif dengan
+riwayat tetap tersimpan.
+M
+Penelusuran.
+FA-97
+Eskalasi bila lewat jatuh tempo tanpa pelunasan.
+M
+RL-12.
+FA-98
+Laporan utang dagang berdasarkan umur (aging) per supplier.
+S
+Perencanaan kas.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Siapa yang menyetujui/mengeksekusi pembayaran ke supplier (owner, manajer, atau peran keuangan yang
+belum didefinisikan) belum ditentukan. Lihat register keputusan (Bagian 21).
+12.11 Daftar ceklis pekerjaan farmasi
+Tujuan: pekerjaan farmasi (harian, berkala, insidental) dapat dipantau status penyelesaiannya oleh farmasis dan
+pemilik/manajer tanpa bertanya satu per satu. Bangun sebagai mesin tugas generik yang dipakai juga oleh
+modul lain.
+
+===== PAGE 28 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 28
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-100
+Tugas dihasilkan otomatis dari peristiwa dan jadwal (mis. faktur
+H-7 memunculkan tugas kontrabon; jadwal semester
+memunculkan tugas pemusnahan); status BELUM, DIPROSES,
+SELESAI.
+M
+Bukan sekadar daftar centang manual.
+FA-101
+Dikelompokkan menurut frekuensi: harian (pelayanan resep,
+etiket, pencatatan suhu vaksin), berkala (opname, SIPNAP
+bulanan, pemusnahan semester), insidental (kontrabon, SP
+baru).
+M
+Kejelasan beban kerja.
+FA-102
+Tugas yang melewati batas waktu wajar tampil dengan penanda
+peringatan.
+M
+RL-21.
+FA-103
+Tugas dapat selesai otomatis bila kondisi terpenuhi (mis. SP
+disetujui) dan hanya dapat diselesaikan manual bila tidak ada
+pemicu otomatis.
+S
+Cegah ceklis kosong.
+FA-104
+Riwayat penyelesaian (siapa, kapan) tersimpan sebagai bagian
+audit trail.
+M
+P6.
+Butir ceklis awal (dapat dikonfigurasi):
+
+Defecta dan SP (reguler dan narkotika/psikotropika) dibuat dan disetujui apoteker
+
+Faktur pembelian yang datang diverifikasi dan diinput ke kartu stok
+
+Rekap narkotika/psikotropika bulanan disusun dan dilaporkan via SIPNAP
+
+Faktur dan resep periode berjalan diarsipkan
+
+Resep hari berjalan (racikan dan non-racikan) terlayani, status tebus sebagian/tidak ditebus tercatat
+
+Harga jual dan skema diskon sesuai master, tanpa pengecualian yang belum tercatat
+
+Etiket seluruh resep hari berjalan tercetak dan sesuai kategori
+
+Faktur H-7 jatuh tempo masuk daftar kontrabon dan dijadwalkan ke hari bayar terdekat
+
+Faktur yang dibayar ditandai lunas sesuai jadwal
+
+Stok opname periode berjalan dilakukan dan selisih dicatat
+
+Pencatatan suhu kulkas vaksin dilakukan sesuai jadwal (pagi/siang/sore)
+
+Daftar kandidat pemusnahan semester ini ditinjau dan diproses
+12.12 Vaksin dan Cold Chain
+KERANGKA BERPIKIR
+Vaksin berbeda dari obat biasa: kerusakan akibat suhu sering tidak terlihat dari fisiknya, dan begitu disuntikkan
+tidak dapat ditarik kembali. Karena itu kontrolnya harus terjadi sebelum vaksin dipakai, bukan sesudahnya.
+Pemilik menetapkan pencatatan suhu masih manual (klinik punya alat pemantau suhu, tapi tanpa sensor IoT
+yang terhubung otomatis); integrasi sensor otomatis disiapkan sebagai pengembangan lanjutan (Fase 4), bukan
+versi awal.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-110
+Form pencatatan suhu kulkas vaksin terjadwal (mis.
+pagi/siang/sore, configurable), diisi manual oleh staf yang
+ditunjuk.
+M
+Ketentuan pemilik: manual untuk versi
+awal.
+FA-111
+Alert bila jadwal pencatatan suhu terlewat (tidak dicatat),
+diperlakukan setara dengan suhu di luar rentang karena
+sama-sama berisiko.
+M
+Ketidaktahuan kondisi vaksin adalah
+risiko tersendiri.
+FA-112
+Rentang suhu aman configurable (default 2-8 derajat Celsius);
+pencatatan di luar rentang memicu status DICURIGAI pada
+seluruh batch vaksin di kulkas terkait.
+M
+Basis keputusan apoteker.
+
+===== PAGE 29 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 29
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-113
+Tabel VaccineTempLog menyimpan field sumber
+(manual/sensor) sejak awal, meski hanya manual yang dipakai
+saat ini, agar integrasi sensor IoT di Fase 4 tinggal menambah
+sumber data tanpa mengubah struktur.
+M
+P8; arsitektur disiapkan untuk
+pengembangan lanjutan.
+FA-114
+Status per batch vaksin: LAYAK, DICURIGAI, TIDAK_LAYAK.
+Perubahan ke TIDAK_LAYAK hanya oleh apoteker penanggung
+jawab (bukan otomatis oleh sistem), dengan alasan wajib.
+M
+Keputusan klinis tetap di tangan
+manusia.
+FA-115
+Batch berstatus TIDAK_LAYAK otomatis terkunci dari
+dispensing (hard-stop); tidak dapat dipilih sistem FEFO maupun
+dicari manual untuk diserahkan.
+M
+P10; mencegah vaksin rusak tersuntik
+ke pasien.
+FA-116
+Insiden cold chain breach (suhu di luar rentang atau jadwal
+pencatatan terlewat berulang) tercatat sebagai insiden formal
+terpisah dari mutasi stok biasa, dengan tautan ke batch dan
+VaccineTempLog terkait.
+M
+Kebutuhan laporan insiden untuk audit
+fasilitas kesehatan.
+FA-117
+Checklist VVM (Vaccine Vial Monitor) sebagai konfirmasi
+sederhana oleh perawat/dokter sebelum vaksin dipakai (mis.
+'VVM masih aman? Ya/Tidak').
+S
+Lapisan kontrol tambahan di titik
+pemakaian; dapat menyusul bila terlalu
+detail untuk versi awal.
+FA-118
+Vaksin yang berstatus TIDAK_LAYAK karena cold chain breach
+masuk ke Daftar Kandidat Pemusnahan (12.14) dengan alasan
+breach tercatat.
+M
+Menyatukan dua alur kontrol, bukan
+jalur terpisah yang mudah terlewat.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Jumlah tingkat rentang suhu/notifikasi (berapa kali peringatan sebelum eskalasi) dan siapa saja yang menerima
+alert breach selain apoteker (mis. owner) belum dirinci pemilik. Bangun sebagai konfigurasi; nilai default: satu
+tingkat peringatan (di luar rentang = breach) karena ini versi manual, bukan bertingkat seperti notifikasi ED (12.10
+punya pola bertingkat terpisah untuk kasus itu).
+12.13 Beyond-Use Date (BUD) untuk Racikan
+KERANGKA BERPIKIR
+Sediaan racik (puyer, kapsul racik, salep racik) kedaluwarsa jauh lebih cepat daripada obat aslinya begitu digerus
+atau dicampur. BUD adalah konsep terpisah dari ED obat asal dari pabrik. Pemilik menyampaikan bahwa secara
+praktik, dokter di kliniknya tidak pernah meresepkan racikan lebih dari 8 hari, dan normalnya racikan habis dalam
+5-7 hari — ini menjadi dasar nilai default, tetapi BUD tetap dihitung sebagai aturan stabilitas farmasetik, bukan
+disamakan begitu saja dengan durasi resep.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-120
+BUD setiap item racikan dihitung otomatis sebagai nilai terkecil
+antara (a) durasi resep yang dituliskan dokter dan (b) batas
+stabilitas maksimum per jenis sediaan racik yang dikonfigurasi
+apoteker.
+M
+Ketentuan pemilik: BUD = min(durasi
+resep, batas stabilitas).
+FA-121
+Batas stabilitas maksimum per jenis sediaan racik (puyer, kapsul
+racik, salep/krim racik, suspensi racik, dsb) adalah parameter
+configurable; nilai default awal 7 hari mengikuti kebiasaan klinik,
+dapat disesuaikan apoteker per jenis sediaan.
+M
+Default dari praktik kliniknya sendiri.
+FA-122
+Bila durasi resep melebihi kebiasaan standar klinik (lebih dari 8
+hari), tampil peringatan lunak ke apoteker untuk konfirmasi BUD
+sebelum racikan diproses, bukan otomatis diperpanjang.
+M
+Mencegah BUD ikut memanjang tanpa
+pertimbangan farmasetik saat resep di
+luar kebiasaan.
+FA-123
+Tanggal BUD tersimpan per PrescriptionItem racikan dan
+tercantum di etiket (bukan ED obat asal).
+M
+FA-81; pasien/orang tua tahu batas
+pakai yang benar.
+
+===== PAGE 30 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 30
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-124
+Instruksi penyimpanan racikan (mis. simpan di kulkas, kocok
+dahulu sebelum pakai, hindari cahaya langsung) adalah field
+wajib pada etiket racikan sejak versi awal, dapat diisi bebas atau
+dipilih dari daftar standar yang configurable.
+M
+Ketentuan pemilik: masuk versi awal,
+bukan menyusul.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+BUD = nilai terkecil antara durasi resep dan batas stabilitas maksimum per jenis sediaan (default 7 hari, dapat
+disesuaikan apoteker). Instruksi penyimpanan racikan menjadi field wajib etiket racikan sejak versi awal.
+12.14 Pemusnahan Obat Rusak/Kedaluwarsa
+KERANGKA BERPIKIR
+Mutasi stok berjenis rusak/ED saja cukup untuk akuntansi stok, tetapi tidak cukup untuk kepatuhan regulasi,
+terutama narkotika/psikotropika yang umumnya mensyaratkan berita acara resmi. Tanpa dokumen formal, barang
+'hilang' dari stok tanpa jejak resmi — ini bertentangan dengan prinsip anti-kebocoran yang mendasari seluruh
+dokumen ini. Pemilik menyatakan klinik belum pernah melakukan pemusnahan karena sirkulasi FEFO yang baik,
+namun fitur ini tetap wajib tersedia, dengan prioritas awal memperkuat notifikasi pencegahan (lihat FA-27 dan
+tabel bertingkat di bawah).
+Notifikasi pencegahan bertingkat (diperkuat sebelum ke alur pemusnahan)
+Tingkat
+Ambang
+default (H-)
+Tujuan
+Penerima
+Peringatan dini
+H-90
+Masih banyak waktu untuk diprioritaskan terjual atau
+ditawar retur ke supplier
+Apoteker
+Perhatian
+H-60
+Mulai diprioritaskan di FEFO, dipromosikan bila
+memungkinkan
+Apoteker
+Mendesak
+H-30
+Upaya aktif: retur ke supplier bila masih bisa, atau
+pindah prioritas penuh
+Apoteker, Owner
+Kritis
+H-7
+Kemungkinan besar menjadi barang musnah; masuk
+daftar kandidat pemusnahan
+Apoteker, Owner
+Keempat ambang di atas bersifat configurable (termasuk jumlah tingkatnya) dan dapat berbeda per kategori obat
+(mis. vaksin butuh ambang lebih panjang).
+Alur pemusnahan
+Batch lolos semua tingkat pencegahan (sampai ED) atau ditandai TIDAK_LAYAK (cold chain breach, 12.12)
+   -> otomatis masuk DAFTAR KANDIDAT PEMUSNAHAN (DestructionBatch = DRAFT)
+   -> terkumpul sampai JADWAL PEMUSNAHAN BERKALA (per semester)
+   -> sistem generate draft Berita Acara (daftar item, batch, jumlah, nilai, alasan)
+   -> apoteker penanggung jawab meninjau & menyetujui (DestructionBatch = APPROVED)
+   -> cetak -> tanda tangan fisik (apoteker + saksi; narkotika/psikotropika sesuai syarat regulasi)
+   -> scan diunggah sebagai arsip (DestructionRecord)
+   -> stok dikurangi via mutasi PEMUSNAHAN yang menaut ke DestructionRecord (DestructionBatch = EXECUTED)
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-130
+Batch yang mencapai ED tanpa terjual, atau ditandai
+TIDAK_LAYAK (termasuk dari cold chain breach), otomatis
+masuk Daftar Kandidat Pemusnahan.
+M
+Tidak ada obat 'hilang' tanpa jejak.
+FA-131
+Jadwal pemusnahan berkala per semester (6 bulan sekali);
+tanggal pastinya configurable.
+M
+Ketentuan pemilik: frekuensi rendah,
+terjadwal.
+
+===== PAGE 31 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 31
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-132
+Pada jadwal tiba, sistem menghasilkan draft Berita Acara
+Pemusnahan otomatis dari seluruh item terkumpul (nama obat,
+batch, jumlah, alasan, estimasi nilai barang).
+M
+P9; tidak disusun manual dari nol.
+FA-133
+Apoteker penanggung jawab meninjau draft dan dapat
+mengecualikan item tertentu (mis. ternyata masih bisa diretur)
+sebelum menyetujui.
+M
+P7; persetujuan oleh pihak berwenang.
+FA-134
+Dokumen final dapat dicetak untuk ditandatangani fisik; hasil
+scan tanda tangan diunggah kembali dan menjadi
+DestructionRecord permanen.
+M
+Bukti formal, terutama
+narkotika/psikotropika yang
+mensyaratkan saksi.
+FA-135
+Stok baru benar-benar berkurang melalui mutasi jenis
+PEMUSNAHAN yang wajib menaut ke DestructionRecord; tidak
+ada mutasi pemusnahan tanpa dokumen.
+M
+Menutup celah kontrol; konsisten
+dengan P2.
+FA-136
+Pemusnahan narkotika/psikotropika mengikuti syarat tambahan
+(saksi, pelaporan ke pihak berwenang) sesuai regulasi yang
+diverifikasi terpisah (Bagian 16.3).
+M
+Kepatuhan regulasi.
+FA-137
+Laporan nilai barang musnah per periode untuk owner, sebagai
+bagian evaluasi efisiensi pengadaan dan FEFO.
+S
+Nilai bisnis; mengukur efektivitas
+notifikasi pencegahan.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Pemusnahan wajib disertai berita acara lengkap yang diketahui/disetujui apoteker penanggung jawab,
+dijadwalkan berkala per semester (bukan per kejadian) agar frekuensinya rendah. Prioritas pembangunan:
+perkuat dulu notifikasi pencegahan bertingkat sebelum alur pemusnahan dipakai secara rutin.
+12.15 Penjualan Bebas (OTC) Tanpa Resep/Kunjungan
+KERANGKA BERPIKIR
+Selama ini seluruh rancangan mengasumsikan obat keluar selalu dari resep dan terikat Visit/Patient ID (P4).
+Pemilik menyatakan ada praktik penjualan obat bebas di loket farmasi tanpa pasien perlu daftar ke resepsionis
+atau bertemu dokter dulu, termasuk untuk pendatang non-pasien atau pengantar pasien. Ini butuh jalur paralel
+yang lebih ringan namun tetap memenuhi kontrol stok dan keuangan yang sama ketatnya dengan jalur resep.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-140
+Transaksi OTC tidak terikat ke Visit/Encounter maupun Patient
+ID (P4 dikecualikan secara sengaja untuk jalur ini); identitas
+pembeli opsional (nama/kontak), berguna untuk penelusuran
+recall bila diisi.
+M
+Ketentuan pemilik: termasuk untuk
+non-pasien/pengantar.
+FA-141
+Hanya obat golongan bebas dan bebas terbatas yang dapat
+muncul di pencarian/transaksi OTC; obat keras, narkotika,
+psikotropika, dan prekursor tidak dapat ditransaksikan lewat jalur
+ini pada level sistem (hard-stop), bukan sekadar aturan SOP.
+M
+P10; mencegah obat keras 'diakali'
+tanpa resep.
+FA-142
+Obat golongan bebas dapat dijual oleh asisten farmasi/apoteker
+tanpa approval tambahan.
+M
+Transaksi ringan, volume tinggi.
+FA-143
+Obat golongan bebas terbatas tetap dapat dijual lewat jalur
+OTC, tetapi wajib otorisasi/pengawasan apoteker (mis. PIN
+apoteker) sebelum transaksi selesai, tercatat siapa apoteker
+pengawasnya.
+M
+Ketentuan pemilik; konsisten dengan
+P7 (persetujuan berjenjang).
+FA-144
+Transaksi OTC tetap wajib: mengurangi stok lewat mutasi
+OUT_OTC (jenis mutasi terpisah dari OUT_RESEP), membentuk
+baris tagihan, dan dibayar di kasir farmasi; harga tetap ditarik
+dari master.
+M
+Tidak membuka celah obat keluar
+tanpa tercatat.
+
+===== PAGE 32 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 32
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-145
+Laporan harian kasir farmasi memisahkan sumber pendapatan:
+dari resep vs dari OTC.
+M
+Transparansi laporan; FA-145
+terhubung ke Bagian 14 dashboard.
+FA-146
+Entitas OTCSale menaut ke Invoice yang sama seperti transaksi
+lain, dengan visit_id bernilai kosong (nullable).
+M
+5.4; konsisten dengan model Invoice
+yang sudah ada.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+OTC berlaku untuk pasien maupun non-pasien/pengantar, tanpa perlu daftar ke resepsionis, untuk obat di luar
+resep. Obat bebas terbatas dijual dengan pengawasan langsung apoteker. Obat keras/narkotika/psikotropika
+tetap terkunci dari jalur ini.
+12.16 Manajemen Multi-Supplier dan Perbandingan Harga
+KERANGKA BERPIKIR
+Satu obat sering dapat dipasok oleh lebih dari satu PBF dengan harga berbeda, dan harga dapat berubah
+sewaktu-waktu. Tanpa dasar sistematis, pemilihan supplier bergantung pada ingatan staf, bukan data. Owner
+sepakat memakai rekomendasi: membangun kapabilitas multi-supplier sejak awal sebagai investasi arsitektur
+kecil, meski praktik saat ini mungkin baru satu distributor per obat.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-150
+Entitas DrugSupplier menautkan satu obat ke lebih dari satu
+supplier, masing-masing dengan harga beli terakhir, lead time
+pengiriman, status aktif, dan penanda prioritas.
+M
+Dasar sistematis memilih supplier.
+FA-151
+Saat membuat defecta/SP, sistem menyarankan supplier
+berdasarkan harga terakhir termurah atau supplier prioritas untuk
+item itu; keputusan akhir tetap di apoteker/asisten farmasi.
+M
+Bukan otomatis dipilihkan sistem (P1
+serupa: bantu, jangan putuskan).
+FA-152
+Riwayat harga per supplier tersimpan dari setiap faktur yang
+diposting, sehingga tren harga per supplier dapat dibandingkan
+tanpa membuka faktur lama satu per satu.
+M
+Efisiensi evaluasi harga.
+FA-153
+SP tetap terbit ke satu supplier terpilih per transaksi pengadaan;
+multi-supplier adalah dasar pemilihan, bukan satu SP ke banyak
+supplier sekaligus.
+M
+Menjaga alur SP tetap sederhana
+(12.2).
+12.17 Metode Costing (Harga Pokok Stok Keluar)
+KERANGKA BERPIKIR
+FEFO menentukan urutan obat keluar secara fisik (batch dengan ED terdekat duluan dipakai), tetapi ini berbeda
+dari metode penghitungan harga pokok (cost) yang dipakai untuk menghitung margin saat harga beli antar
+batch berbeda-beda. Tanpa kejelasan ini, angka margin pada dashboard owner (Bagian 14) bisa menyesatkan.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-160
+Metode costing yang dipakai adalah FIFO cost mengikuti
+urutan FEFO: cost yang dicatat pada mutasi keluar sama
+dengan cost_unit batch yang secara fisik sedang dikeluarkan.
+M
+Owner memilih rekomendasi ini; fisik
+dan pembukuan berjalan beriringan,
+tanpa perlu menghitung rata-rata
+terpisah.
+FA-161
+cost_unit disimpan pada StockMovement saat posting faktur
+(FA-22) dan dibawa apa adanya saat batch itu keluar (resep,
+OTC, maupun pemusnahan).
+M
+Sumber margin yang konsisten dan
+dapat ditelusur per batch.
+
+===== PAGE 33 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 33
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+FA-162
+Laporan margin (MG-03) dihitung dari selisih harga jual snapshot
+dikurangi cost_unit yang tercatat pada baris mutasi terkait, bukan
+dihitung ulang dari rata-rata.
+M
+Akurasi dashboard owner.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Metode costing: FIFO cost mengikuti urutan FEFO, sesuai rekomendasi yang disetujui owner.
+
+===== PAGE 34 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 34
+13. Modul Kasir (Klinik dan Farmasi)
+KERANGKA BERPIKIR
+Kasir adalah muara seluruh modul (dokter, farmasi, front desk, dan kini juga OTC) sekaligus titik paling rawan
+kebocoran. Pemilik menyatakan tidak ingin ada kebocoran sedikit pun. Karena itu kontrol terkuat bukan berada di
+kasir semata, melainkan pada kecocokan otomatis lintas modul: tindakan medis, tagihan, dan kas harus selalu
+bisa dicocokkan. Modus yang ditutup: diskon siluman, transaksi tunai tidak diinput, void/refund fiktif setelah
+closing, harga diketik manual.
+13.1 Dua titik kasir
+Sistem mengenal titik kasir bertipe klinik (layanan dan tindakan) dan farmasi (obat, termasuk resep dan OTC).
+Masing-masing memiliki shift, laci kas, dan laporan sendiri tetapi berbagi mesin harga, aturan diskon, mesin
+approval, dan audit log yang sama. Laporan konsolidasi menggabungkan keduanya, dengan kasir farmasi
+memisahkan sumber resep vs OTC (FA-145).
+13.2 Alur shift
+Buka shift (kas awal + serah terima) -> transaksi berjalan
+   -> tutup shift: sistem hitung kas akhir teoretis
+   -> kasir hitung fisik -> bandingkan -> selisih dicatat (apa pun nilainya)
+   -> setor kas -> RECONCILED -> DEPOSITED
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+KS-01
+Kas awal (modal) diinput sebelum transaksi pertama, mencatat
+siapa menyerahkan dan siapa menerima.
+M
+Cegah modal tak tercatat.
+KS-02
+Kas akhir teoretis dihitung sistem (kas awal + tunai masuk -
+refund tunai) dan dibandingkan dengan hitung fisik oleh kasir.
+M
+Basis rekonsiliasi.
+KS-03
+Selisih sekecil apa pun wajib tercatat di laporan shift; tidak
+ada opsi 'menggenapkan' tanpa jejak.
+M
+P2, P6.
+KS-04
+Setiap shift terikat satu akun kasir aktif; dua orang tidak berbagi
+satu sesi login.
+M
+Akuntabilitas per transaksi.
+KS-05
+Pencatatan setor kas dan penerimanya.
+S
+Rantai kas lengkap.
+13.3 Transaksi: harga, diskon, komponen
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+KS-10
+Harga selalu ditarik dari master; tidak ada field ketik harga
+manual untuk layanan/obat yang terdaftar.
+M
+Kunci anti-fraud.
+KS-11
+Diskon hanya lewat aturan di sistem (kelompok pasien,
+persentase tetap, kode); di luar aturan memerlukan persetujuan.
+Kasir tidak mengetik angka diskon bebas.
+M
+Diskon siluman.
+KS-12
+Pengecualian harga hanya melalui jalur persetujuan terpisah.
+M
+P7.
+KS-13
+Tagihan terbentuk otomatis dari Order tindakan, resep, dan
+transaksi OTC; setiap InvoiceLine menaut ke sumbernya
+(tindakan/obat/embalase/kemasan/otc).
+M
+Rekonsiliasi.
+KS-14
+Invoice menyimpan snapshot harga dan aturan diskon yang
+dipakai.
+M
+Audit.
+13.4 Void, pembatalan, refund
+
+===== PAGE 35 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 35
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+KS-20
+Void/pembatalan setelah struk tercetak wajib persetujuan
+kedua (PIN/otorisasi supervisor atau owner) sebelum berlaku.
+M
+Modus klasik: tunai diterima lalu void.
+KS-21
+Setiap void/refund wajib beralasan (daftar standar atau teks
+singkat) dan tersimpan permanen bersama transaksi.
+M
+Jejak.
+KS-22
+Refund non-tunai mengikuti jalur resmi penyedia pembayaran,
+bukan dikompensasi tunai manual.
+M
+Kontrol arus kas.
+KS-23
+Level persetujuan bertingkat berdasarkan nilai nominal
+(supervisor untuk rutin, owner di atas ambang).
+S
+Fleksibel.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Ambang selisih kas yang dianggap wajar dan wewenang persetujuan void (supervisor saja atau melibatkan
+owner untuk nilai tertentu) belum ditetapkan pemilik. Default aman: sistem selalu menampilkan dan mencatat
+selisih berapa pun nilainya; persetujuan dua tingkat (supervisor rutin, owner di atas ambang yang ditentukan
+pemilik). Bangun sebagai konfigurasi.
+13.5 Metode pembayaran dan rekonsiliasi
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+KS-30
+Tunai, kartu, dan QRIS/transfer direkonsiliasi terpisah per
+metode saat closing.
+M
+Selisih terlokalisasi.
+KS-31
+Pembayaran non-tunai tervalidasi otomatis lewat integrasi
+EDC/payment gateway; kasir tidak dapat menandai 'sudah bayar'
+tanpa bukti sistem.
+M
+Bukti pembayaran.
+KS-32
+Rekonsiliasi lintas modul otomatis: tindakan dokter dengan
+tagihan; resep diserahkan dengan tagihan farmasi; jumlah Visit
+selesai dengan jumlah transaksi kasir hari itu (OTC dikecualikan
+dari pencocokan berbasis Visit, tetap direkonsiliasi lewat
+FA-144).
+M
+RL-06, RL-07, RL-08, RL-20.
+KS-33
+Pasien berstatus diperiksa/dilayani tanpa transaksi kasir terkait
+muncul sebagai anomali pada hari yang sama.
+M
+Bukan menunggu audit bulanan.
+KS-34
+Struk/kuitansi dari sistem dengan nomor unik berurutan; tidak
+ada penomoran manual.
+M
+Integritas.
+KETENTUAN FINAL (sudah diputuskan pemilik)
+Pemilik menetapkan: harga ditarik dari master (tidak diketik manual), diskon hanya lewat aturan, void butuh
+persetujuan kedua dengan alasan, rekonsiliasi lintas modul otomatis, audit trail permanen, dan pembayaran
+farmasi (resep maupun OTC) dilakukan di kasir farmasi.
+
+===== PAGE 36 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 36
+14. Modul Manajer Operasional dan Owner
+KERANGKA BERPIKIR
+Pemilik ingin melihat pertumbuhan bisnis dan anomali per role/divisi. Owner membutuhkan ringkasan yang
+dapat ditindaklanjuti, bukan laporan mentah yang harus digulir. Perbedaan software 'pencatat' dan 'pengontrol'
+ada di sini: anomali harus muncul sebagai peringatan. Manajer operasional menjalankan operasional dan
+persetujuan rutin; owner mengawasi dan menetapkan kebijakan.
+14.1 Dashboard
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+MG-01
+Dashboard pertumbuhan: jumlah pasien (baru/lama), revenue
+per poli, dokter, dan layanan (termasuk revenue OTC terpisah),
+tren periodik.
+M
+Pertumbuhan bisnis.
+MG-02
+Utilisasi dokter dan ruang; waktu tunggu (WAITING ke
+IN_SERVICE); durasi proses farmasi; no-show rate.
+M
+Efisiensi operasional.
+MG-03
+Margin per layanan dan per kategori obat (dihitung dari cost
+FIFO, 12.17); obat terlaris; stok mendekati ED (bertingkat,
+12.14); nilai persediaan; nilai barang musnah per periode.
+M
+Finansial dan stok.
+MG-04
+Void/refund rate, selisih kas, diskon di luar aturan per kasir dan
+shift.
+M
+Kontrol.
+MG-05
+Pusat anomali: daftar peringatan dari mesin aturan (Bagian 19)
+dengan status ditinjau/ditindak.
+M
+Kontrol harian.
+MG-06
+Status seluruh Order dan dokumen (mis. berapa resep
+dispensed/processing/waiting; surat belum dicetak; status
+pemusnahan DRAFT/APPROVED/EXECUTED).
+M
+Kontrol operasional.
+MG-07
+Hak akses: manajer tidak melihat gaji/margin per dokter; owner
+melihat sesuai kebijakan; keduanya tidak membuka RM tanpa
+alasan tercatat.
+M
+Matriks akses.
+MG-08
+Retensi pasien: kepatuhan imunisasi/kontrol (anak) dan
+penyelesaian sesi lanjutan (gigi).
+S
+Nilai bisnis.
+14.2 Maintenance alat
+Maintenance alat (terutama dental unit, alat sterilisasi, dan kulkas vaksin) yang tidak terjadwal sistematis adalah
+risiko downtime layanan sekaligus risiko keselamatan, dan sering menjadi titik buta klinik kecil.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+MT-01
+Register alat: nama, lokasi/ruang, tanggal beli, interval
+maintenance, penanggung jawab.
+M
+Basis jadwal; termasuk kulkas vaksin.
+MT-02
+Jadwal maintenance preventif dan pengingat otomatis sebelum
+jatuh tempo.
+M
+Cegah downtime.
+MT-03
+Log servis: tanggal, tindakan, biaya (opsional), teknisi; status alat
+(siap/rusak/servis).
+M
+Riwayat.
+MT-04
+Status alat memengaruhi status kesiapan ruang tindakan yang
+dilihat perawat/dokter (NR-08).
+S
+Keterkaitan layanan.
+MT-05
+Laporan utilisasi ruang/alat dan downtime.
+S
+Perencanaan.
+MT-06
+Perawat dapat melaporkan kerusakan/anomali alat yang menjadi
+tugas bagi manajer.
+M
+Alur pelaporan.
+
+===== PAGE 37 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 37
+14.3 SDM dan shift
+Manajer mengelola jadwal shift staf non-medis, kehadiran, dan produktivitas per role (laporan performa). Data
+kompensasi dokter, bila kelak dimasukkan, tergolong sangat sensitif dan hanya untuk owner.
+15. Komunikasi Internal: Memo dan Pengumuman
+KERANGKA BERPIKIR
+Operasional yang mulus butuh komunikasi antar divisi yang terstruktur. Ada dua kebutuhan yang karakternya
+berbeda dan sebaiknya tidak disatukan menjadi satu fitur chat bebas: memo terarah (permintaan/notifikasi
+spesifik antar role) yang butuh status agar tidak hilang di tengah jalan, dan pengumuman umum (broadcast)
+yang butuh tanggal berlaku dan bukti terbaca.
+15.1 Memo terarah (point-to-point)
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+MM-01
+Pengirim memilih penerima berupa role/divisi tertentu atau orang
+tertentu; kategori memo (mis. permintaan pengadaan, notifikasi
+ketersediaan obat, umum).
+M
+Contoh: dokter meminta pengadaan
+obat ke farmasi.
+MM-02
+Status: NEW, READ, IN_PROGRESS, DONE; pengirim dapat
+memantau statusnya.
+M
+Permintaan tidak hilang.
+MM-03
+Memo dapat ditautkan ke entitas terkait (mis. permintaan
+pengadaan tertaut ke defecta/SP; notifikasi ketersediaan tertaut
+ke obat).
+M
+Tanpa salin manual.
+MM-04
+Farmasi dapat mengirim notifikasi ketersediaan obat ke dokter
+(mis. obat X kosong atau sudah tersedia).
+M
+Kebutuhan pemilik.
+MM-05
+Memo yang melewati batas waktu tanggap ditandai overdue dan
+tercatat.
+S
+RL-16.
+MM-06
+Seluruh memo tersimpan dan dapat ditelusur (audit).
+M
+P6.
+15.2 Pengumuman umum (broadcast)
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+MM-10
+Satu arah dari pengirim ke semua divisi atau role tertentu (mis.
+cuti, libur, tugas seminar).
+M
+Kebutuhan pemilik.
+MM-11
+Tanggal berlaku (dari-sampai) dan pengingat otomatis mendekati
+tanggal.
+M
+Tidak muncul sekali lalu hilang.
+MM-12
+Tanda terbaca (read receipt): daftar penerima yang sudah/belum
+melihat.
+S
+Pastikan informasi penting sampai.
+MM-13
+Siapa boleh menyiarkan: owner dan manajer; staf dapat
+mengirim pemberitahuan cuti melalui alur yang ditentukan.
+S
+Matriks akses.
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Dua hal belum dijawab pemilik: (1) apakah permintaan pengadaan dari dokter menggantikan defecta otomatis
+atau melengkapinya. Rekomendasi: melengkapi; defecta otomatis berjalan dari saldo, memo untuk kebutuhan di
+luar pola normal (mis. obat yang belum pernah dipesan). (2) apakah pengumuman cuti/libur terhubung ke
+jadwal sehingga otomatis memengaruhi slot booking. Rekomendasi: cuti dokter terhubung ke jadwal praktik;
+pengumuman umum lain berupa informasi saja.
+
+===== PAGE 38 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 38
+16. Audit, Keamanan, dan Kepatuhan
+16.1 Audit trail
+KETENTUAN FINAL
+Audit trail permanen dan tidak dapat diubah oleh peran mana pun, termasuk owner, manajer, dan
+administrator (kecuali fungsi baca). Tidak boleh ada endpoint, menu, atau perintah basis data reguler untuk
+mengubah/menghapus log.
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+SC-01
+Catat untuk setiap aksi bermakna: siapa, kapan, role aktif,
+perangkat/IP, jenis aksi, entitas dan ID, nilai sebelum dan
+sesudah, alasan (bila ada).
+M
+Bukan hanya modul keuangan;
+mencakup RM, stok, resep, master,
+vaksin, pemusnahan.
+SC-02
+Tabel append-only; disarankan hash berantai (setiap baris
+menyimpan hash baris sebelumnya) untuk mendeteksi
+manipulasi.
+M
+Bukti integritas.
+SC-03
+Percobaan aksi yang ditolak (mis. perawat menyunting entri
+dokter, kasir mengubah harga, asisten farmasi menjual obat
+keras lewat OTC) juga tercatat.
+M
+Deteksi penyalahgunaan.
+SC-04
+Log dapat dicari dan difilter (aktor, entitas, rentang waktu);
+ekspor untuk audit juga tercatat.
+M
+Investigasi.
+SC-05
+Riwayat edit transaksi menyimpan rentang waktu antar aksi
+(dibuat, diubah, dihapus).
+M
+RL-04.
+SC-06
+Akses ke rekam medis (baca) dicatat, termasuk break-glass
+dengan alasan.
+M
+Privasi pasien.
+16.2 Keamanan dan privasi
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+SC-10
+Autentikasi kuat; MFA untuk owner, apoteker, dan dokter yang
+menandatangani resep; sesi berakhir otomatis saat tidak aktif.
+M
+Perangkat bersama di klinik.
+SC-11
+Enkripsi saat transit dan saat disimpan untuk data pasien; kunci
+dikelola aman.
+M
+Data kesehatan sensitif.
+SC-12
+Pencadangan (backup) terjadwal dan uji pemulihan; target
+RPO/RTO ditetapkan pemilik bersama tim.
+M
+Kelangsungan operasional.
+SC-13
+Masking data pada layar yang tidak membutuhkan detail;
+pembatasan ekspor data pasien.
+S
+Minimalkan paparan.
+SC-14
+Manajemen pengguna: nonaktifkan (bukan hapus) akun staf
+yang keluar; peninjauan hak akses berkala.
+M
+Turnover tinggi.
+SC-15
+Pemisahan lingkungan uji dan produksi; data produksi tidak
+dipakai untuk pengujian tanpa anonimisasi.
+M
+Praktik aman.
+16.3 Kepatuhan regulasi (harus diverifikasi sebelum go-live)
+Tim wajib menyusun spesifikasi kepatuhan terpisah dengan merujuk peraturan yang berlaku pada saat
+implementasi. Dokumen ini sengaja tidak mengunci pasal atau angka tertentu karena dapat berubah. Butir yang
+perlu diverifikasi:
+
+Ketentuan rekam medis elektronik (isi, keamanan, retensi, hak akses).
+
+Pelindungan data pribadi pasien.
+
+===== PAGE 39 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 39
+
+Persyaratan resep (kop, identitas fasilitas dan dokter, tanda tangan elektronik) dari BPOM, Kemenkes, Dinkes
+setempat.
+
+Ketentuan pelayanan kefarmasian, penyimpanan resep, dan masa retensi dokumen.
+
+Ketentuan pengelolaan dan pelaporan narkotika/psikotropika/prekursor, termasuk format dan mekanisme
+SIPNAP terbaru.
+
+Ketentuan penyimpanan dan rantai dingin (cold chain) vaksin sesuai pedoman program imunisasi yang
+berlaku.
+
+Ketentuan pemusnahan obat dan sediaan farmasi, termasuk syarat saksi dan pelaporan untuk
+narkotika/psikotropika.
+
+Ketentuan penjualan obat golongan bebas dan bebas terbatas di fasilitas kesehatan.
+
+Ketentuan interoperabilitas data kesehatan nasional yang berlaku bagi fasilitas sejenis.
+17. Integrasi dan Perangkat
+Kebutuhan
+Tujuan
+Catatan
+Gateway WhatsApp/SMS
+Konfirmasi janji, pengingat, reminder
+imunisasi dan kontrol.
+Templat pesan configurable; catat status
+kirim.
+Printer label (thermal)
+Etiket obat putih/biru.
+Ukuran label configurable; cetak ulang
+tercatat.
+Printer dokumen A4/A5
+Resep salinan, surat sakit, rujukan, SP,
+kontrabon, kuitansi, berita acara
+pemusnahan.
+Render dari template dokumen berversi.
+EDC / QRIS / payment
+gateway
+Validasi pembayaran non-tunai otomatis.
+KS-31.
+Pemindai barcode / kamera
+Penerimaan barang, opname, scan resep
+dan faktur fisik, scan dokumen pemusnahan.
+Opsional (FA-29), scan wajib untuk resep
+eksternal dan DestructionRecord.
+Referensi obat eksternal
+(mis. Medscape)
+Cek interaksi/keamanan dari layar resep.
+Tautan cepat dengan nama generik terisi
+otomatis.
+SIPNAP
+Pelaporan narkotika/psikotropika.
+Tim menelusuri integrasi/format impor
+terbaru.
+Tanda tangan/otentikasi
+elektronik
+Resep dan surat resmi.
+Sesuai regulasi terverifikasi.
+Sensor suhu kulkas vaksin
+(IoT)
+Pemantauan cold chain otomatis.
+Tidak ada di versi awal (pencatatan manual);
+disiapkan sebagai pengembangan Fase 4
+(lihat FA-113).
+Interoperabilitas data
+kesehatan nasional
+Bila diwajibkan/bermanfaat.
+Evaluasi terpisah.
+
+===== PAGE 40 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 40
+18. Kebutuhan Non-Fungsional
+ID
+Kebutuhan
+Prio
+Alasan / catatan implementasi
+NF-01
+Responsif pada jam ramai: autocomplete obat dan pencarian
+pasien terasa instan; layar dokter tidak boleh lag saat mengetik
+resep.
+M
+Efisiensi waktu dan tenaga.
+NF-02
+Jumlah klik dan langkah minimal pada alur utama; tombol
+tindakan di satu layar.
+M
+P1.
+NF-03
+Konkurensi aman: dua pengguna tidak menyebabkan stok
+negatif atau pesanan ganda; Order idempoten.
+M
+5.2.
+NF-04
+Ketersediaan tinggi pada jam operasional klinik; jendela
+pemeliharaan di luar jam praktik.
+M
+Layanan pasien.
+NF-05
+Toleransi gangguan koneksi: draf klinis tersimpan lokal
+sementara dan disinkronkan; tidak ada kehilangan data.
+M
+DR-04.
+NF-06
+Antarmuka berbahasa Indonesia; ukuran huruf dan kontras
+memadai; nyaman di desktop dan tablet (perawat/dokter).
+M
+Penggunaan harian.
+NF-07
+Zona waktu klinik dan stempel waktu server yang konsisten pada
+semua transaksi dan log.
+M
+Integritas audit.
+NF-08
+Skalabilitas ke lebih dari satu cabang tanpa perombakan
+(branch_id).
+S
+Skala belum ditetapkan.
+NF-09
+Impor data awal (master obat, pasien, saldo awal stok per batch)
+dengan validasi dan laporan kesalahan.
+M
+Migrasi.
+NF-10
+Mode pelatihan/sandbox dengan data uji untuk melatih staf.
+S
+Adopsi.
+NF-11
+Pemantauan sistem, log kesalahan, dan alert teknis untuk tim
+pemeliharaan.
+M
+Operasional.
+NF-12
+Semua parameter yang disebut configurable dapat diubah admin
+melalui antarmuka tanpa deploy, dan perubahan tercatat di audit
+log.
+M
+P8.
+
+===== PAGE 41 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 41
+19. Katalog Aturan Kontrol dan Deteksi Anomali
+KERANGKA BERPIKIR
+Ini adalah inti tujuan pemilik: mengetahui kebocoran dan anomali pada hari yang sama. Bangun sebagai mesin
+aturan (rule engine) yang membaca peristiwa dan data, menghasilkan AnomalyRaised, dan menampilkannya di
+Pusat Anomali (MG-05). Setiap aturan punya parameter yang dapat diubah dan penerima peringatan. Nilai
+ambang (N, X, T) ditetapkan pemilik; dokumen ini sengaja tidak mengarang angka, kecuali H-7 dan jadwal
+semester yang sudah diputuskan.
+ID
+Kondisi / pemicu
+Parameter
+Penerima peringatan
+RL-01
+Selisih kas saat closing tidak nol; berulang pada
+kasir/shift yang sama.
+Selisih tercatat selalu; ambang T1
+memicu peringatan; N kali berulang
+eskalasi.
+Manajer, Owner (eskalasi)
+RL-02
+Frekuensi void/refund melebihi wajar per kasir
+per shift.
+Ambang N per shift.
+Manajer, Owner
+RL-03
+Diskon di luar aturan standar atau pengecualian
+berulang oleh kasir yang sama.
+Ambang N per periode.
+Manajer, Owner
+RL-04
+Transaksi dibuat lalu diedit/dihapus dalam
+rentang sangat singkat.
+Rentang X menit.
+Manajer
+RL-05
+Transaksi di luar jam operasional klinik.
+Jam operasional dikonfigurasi.
+Manajer, Owner
+RL-06
+Visit COMPLETED tanpa Invoice/transaksi kasir
+terkait pada akhir hari.
+Dievaluasi harian.
+Manajer, Owner
+RL-07
+Tindakan tercatat tetapi tidak tertagih, atau
+tertagih tanpa tindakan.
+Dievaluasi per kunjungan.
+Manajer
+RL-08
+Resep DISPENSED tanpa baris tagihan farmasi.
+Seketika.
+Apoteker, Manajer
+RL-09
+Selisih stok opname vs sistem melebihi ambang.
+Ambang per item/nilai.
+Apoteker, Owner
+RL-10
+Batch melewati ambang notifikasi bertingkat
+(H-90/60/30/7, 12.14) menuju ED, atau sudah ED
+dan belum dihapus.
+Empat tingkat, configurable.
+Apoteker (semua tingkat),
+Owner (H-30 dan H-7)
+RL-11
+Saldo stok menyentuh reorder point.
+Otomatis membuat defecta.
+Apoteker/Asisten
+RL-12
+Faktur pembelian memasuki H-7 jatuh tempo;
+lewat jatuh tempo tanpa pelunasan.
+H-7 (ketentuan final); eskalasi
+setelah jatuh tempo.
+Apoteker, Keuangan,
+Owner (eskalasi)
+RL-13
+Konversi dosis menghasilkan pecahan sediaan
+tidak wajar.
+Langkah pecahan per bentuk
+sediaan.
+Apoteker, Dokter (bila
+dikembalikan)
+RL-14
+Pemakaian narkotika/psikotropika tak wajar
+(keluar tanpa resep terkait, lonjakan).
+Ambang per item.
+Apoteker penanggung
+jawab, Owner
+RL-15
+Harga jual di bawah harga beli atau margin di
+bawah minimum.
+Margin minimum kebijakan.
+Apoteker (blok), Owner
+RL-16
+Order/dokumen melewati batas waktu (surat
+belum dicetak, resep belum diterima, memo
+belum ditanggapi).
+SLA per jenis.
+Divisi tujuan, Manajer
+RL-17
+Percobaan mengubah master harga/data oleh
+pihak tidak berwenang.
+Hard-stop; selalu dicatat.
+Owner
+RL-18
+Akses rekam medis di luar penugasan
+(break-glass).
+Selalu memerlukan alasan.
+Manajer, Owner
+RL-19
+Perubahan slot booking tidak wajar (batal lalu
+booking ulang di luar pola).
+Pola per periode.
+Manajer
+
+===== PAGE 42 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 42
+ID
+Kondisi / pemicu
+Parameter
+Penerima peringatan
+RL-20
+Jumlah Visit selesai diperiksa tidak sama dengan
+jumlah transaksi kasir (klinik + farmasi yang
+relevan) hari itu.
+Dievaluasi harian.
+Manajer, Owner
+RL-21
+Tugas checklist melewati batas waktu.
+Batas per tugas.
+Pemilik tugas, Manajer
+RL-22
+Override peringatan alergi/interaksi yang sering
+oleh dokter tertentu.
+Informatif; ambang pemantauan.
+Owner/Manajer
+RL-23
+Pencatatan suhu kulkas vaksin terlewat dari
+jadwal, atau suhu di luar rentang aman (breach).
+Jadwal dan rentang configurable.
+Apoteker, Owner
+RL-24
+Batch vaksin berstatus TIDAK_LAYAK tetapi
+masih ada upaya dispensing (percobaan ditolak
+sistem).
+Hard-stop; selalu dicatat.
+Apoteker penanggung
+jawab, Owner
+RL-25
+Daftar Kandidat Pemusnahan menumpuk
+melewati satu periode semester tanpa diproses.
+Siklus semester.
+Apoteker penanggung
+jawab, Owner
+RL-26
+Percobaan transaksi OTC untuk golongan obat
+keras/narkotika/psikotropika (hard-stop oleh
+sistem).
+Selalu dicatat.
+Apoteker, Owner
+RL-27
+Transaksi OTC golongan bebas terbatas tanpa
+otorisasi apoteker pengawas.
+Hard-stop; selalu dicatat.
+Apoteker, Owner
+20. Skenario Penerimaan (Acceptance Criteria)
+Skenario berikut adalah uji minimal agar tim penerima (pemilik) dapat memastikan sistem berperilaku sesuai
+kebutuhan. Setiap skenario menautkan ke ID kebutuhan.
+ID
+Kondisi awal dan aksi
+Hasil yang harus terjadi
+AC-01
+Dokter A login; antrian berisi pasien untuk dokter A
+dan dokter B.
+Hanya pasien dokter A yang tampil. (DR-01)
+AC-02
+Dokter menekan Terima Pasien.
+Status IN_SERVICE; konteks Visit/Patient/Doctor terkunci; aksi
+selanjutnya menempel pada Visit itu. (DR-02)
+AC-03
+Perawat menyimpan vital dan keluhan.
+Data langsung tampil di workspace dokter tanpa muat ulang,
+dan masuk RM kunjungan. (NR-07)
+AC-04
+Perawat mencoba menyunting anamnesis dokter.
+Ditolak; percobaan tercatat di audit log. (NR-06, SC-03)
+AC-05
+Dokter menulis teks bebas: R/ Amoxicillin 500 mg,
+3 dd 1, No. XV, sesudah makan, Iter 1.
+Panel konfirmasi menampilkan obat cocok, dosis 1 kapsul, 3 x
+sehari, jumlah 15, iter 1; dokumen resep memuat tulisan dokter
+apa adanya. (DR-12, DR-14)
+AC-06
+Dokter menulis obat yang tidak ada di master.
+Baris ditandai TAK DIKENALI, tidak memblokir kirim; farmasi
+menerima dengan penanda. (DR-12)
+AC-07
+Pasien beralergi penisilin; dokter menulis
+amoksisilin.
+Peringatan alergi; melanjutkan wajib memilih alasan yang
+tercatat. (DR-13)
+AC-08
+Resep sudah SIGNED; dokter ingin mengubah.
+Tidak dapat menimpa; harus membuat versi baru, versi lama
+tersimpan. (DR-15)
+AC-09
+Resep dikirim ke farmasi.
+Muncul di antrian farmasi seketika dengan kop resmi, nama
+dan no RM dapat diklik menuju RM. Pengiriman ganda tidak
+membuat resep ganda. (DR-16, DR-17, FA-40, 5.2)
+AC-10
+Farmasi menandai baris ambigu.
+Resep RETURNED_TO_DOCTOR; dokter dinotifikasi; revisi
+menjadi versi baru. (FA-50, DR-18)
+AC-11
+Faktur diinput dengan jumlah lebih sedikit dari SP.
+Selisih di-flag saat input; batch dan ED wajib terisi. (FA-20,
+FA-21)
+
+===== PAGE 43 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 43
+ID
+Kondisi awal dan aksi
+Hasil yang harus terjadi
+AC-12
+Faktur diposting.
+Mutasi IN per batch terbentuk atomik dengan cost_unit; saldo
+kartu stok bertambah; dispensing berikutnya memakai FEFO.
+(FA-22, FA-23, FA-24)
+AC-13
+Racikan dengan kebutuhan 362,5 mg dari tablet 50
+mg.
+Konversi 7,25 tablet ter-flag pecahan ganjil; opsi kembalikan
+atau lanjut dengan alasan. Stok terpotong dari master tunggal.
+(FA-45, FA-01, RL-13)
+AC-14
+Resep ditebus sebagian.
+Sisa dihitung otomatis; salinan resep dapat dicetak dengan
+sisa, atau as is dengan det/ne det/iter dan angka rujukan.
+(FA-46, FA-47)
+AC-15
+Dispensing selesai.
+Etiket tercetak otomatis; warna putih/biru mengikuti rute; cetak
+ulang tercatat. PIO dapat dilewati. (FA-80..FA-84, FA-48)
+AC-16
+Harga jual disetel dari faktur di luar batas margin.
+Memerlukan persetujuan owner; perubahan berversi; transaksi
+lama tetap memakai snapshot. (FA-30, FA-31)
+AC-17
+Pasien kelompok karyawan menebus resep
+berkemasan dan embalase.
+Diskon aturan karyawan diterapkan otomatis; kemasan dan
+embalase muncul sebagai baris terpisah; dibayar di kasir
+farmasi. (FA-32, FA-33, FA-35)
+AC-18
+Kasir mencoba mengetik harga manual.
+Tidak tersedia field; harga hanya dari master. (KS-10)
+AC-19
+Kasir membatalkan transaksi setelah struk
+tercetak.
+Butuh persetujuan kedua dan alasan; keduanya tersimpan.
+(KS-20, KS-21)
+AC-20
+Closing shift dengan selisih kas.
+Selisih tercatat apa pun nilainya; tidak dapat digenapkan;
+masuk laporan. (KS-03)
+AC-21
+Visit COMPLETED tetapi tidak ada transaksi kasir
+pada akhir hari.
+Muncul di Pusat Anomali hari itu. (KS-33, RL-06)
+AC-22
+Faktur memasuki H-7 jatuh tempo; hari bayar
+terdekat jatuh setelah jatuh tempo.
+Notifikasi H-7; masuk daftar kontrabon; peringatan
+keterlambatan dan usulan hari bayar lebih awal. (FA-91..FA-94)
+AC-23
+Pengguna (termasuk owner) mencoba mengedit
+atau menghapus log audit.
+Tidak ada jalur; percobaan tercatat. (SC-01..SC-03)
+AC-24
+Dokter mengirim memo permintaan obat; farmasi
+menanggapi.
+Status NEW, READ, IN_PROGRESS, DONE terlihat pengirim;
+memo tertaut defecta/obat. (MM-01..MM-04)
+AC-25
+Broadcast cuti dengan tanggal berlaku.
+Terkirim ke sasaran; pengingat mendekati tanggal; daftar
+sudah/belum terbaca. (MM-10..MM-12)
+AC-26
+Akhir bulan.
+Rekap narkotika/psikotropika tersusun otomatis dalam format
+lapor tanpa rekap manual. (FA-63)
+AC-27
+Front desk membuka pasien.
+Hanya identitas dan status (belum/sedang/selesai); isi RM tidak
+tersedia. (FD-06)
+AC-28
+Owner mencoba mengubah transaksi operasional.
+Tidak diizinkan (read-only); hanya persetujuan/kebijakan.
+(Bagian 6)
+AC-29
+Perawat menginput BB/TB anak.
+Growth chart terbarui otomatis dengan persentil; reminder
+imunisasi terjadwal ke wali. (NR-10, AN-01..AN-03)
+AC-30
+Sesi perawatan gigi ke-2 dari paket selesai.
+Tertagih tepat satu kali; sisa sesi berkurang; jadwal sesi
+lanjutan diusulkan. (GG-03, GG-04, GG-05)
+AC-31
+Dokter mengetik nama obat yang stoknya kosong.
+Status stok kualitatif tampil, alternatif setara disarankan,
+substitusi tidak otomatis. (DR-11)
+AC-32
+Staf memegang dua role.
+Sistem meminta role aktif; audit log mencatat role yang dipakai.
+(Bagian 6)
+
+===== PAGE 44 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 44
+ID
+Kondisi awal dan aksi
+Hasil yang harus terjadi
+AC-33
+Staf mencatat suhu kulkas vaksin di luar rentang
+aman.
+Seluruh batch vaksin di kulkas itu berstatus DICURIGAI;
+insiden breach tercatat terpisah dari mutasi stok. (FA-112,
+FA-116, RL-23)
+AC-34
+Jadwal pencatatan suhu pagi terlewat tanpa input.
+Alert muncul setara dengan breach; tercatat sebagai kelalaian
+pencatatan. (FA-111, RL-23)
+AC-35
+Apoteker menandai batch vaksin TIDAK_LAYAK;
+staf lain mencoba mendispensing batch itu.
+Dispensing ditolak sistem (hard-stop); percobaan tercatat.
+(FA-114, FA-115, RL-24)
+AC-36
+Dokter meresepkan racikan untuk 6 hari.
+BUD = 6 hari (mengikuti durasi resep, di bawah batas stabilitas
+default 7 hari); etiket mencantumkan BUD dan instruksi
+penyimpanan. (FA-120, FA-123, FA-124)
+AC-37
+Dokter meresepkan racikan untuk 10 hari.
+Peringatan lunak ke apoteker untuk konfirmasi BUD sebelum
+diproses, karena melebihi kebiasaan standar 8 hari. (FA-122)
+AC-38
+Batch obat mencapai ED tanpa terjual; jadwal
+pemusnahan semester tiba.
+Batch otomatis masuk Daftar Kandidat Pemusnahan; sistem
+menghasilkan draft Berita Acara; menunggu persetujuan
+apoteker penanggung jawab. (FA-130, FA-132, FA-133)
+AC-39
+Apoteker menyetujui draft Berita Acara
+Pemusnahan dan mengunggah hasil scan tanda
+tangan.
+DestructionRecord terbentuk; stok berkurang via mutasi
+PEMUSNAHAN yang menaut ke dokumen; tidak ada mutasi
+pemusnahan tanpa dokumen. (FA-134, FA-135)
+AC-40
+Pengantar pasien (bukan pasien terdaftar)
+membeli parasetamol di loket farmasi tanpa daftar
+ke resepsionis.
+Transaksi OTCSale terbentuk tanpa Visit/Patient ID; identitas
+pembeli opsional; stok berkurang (OUT_OTC) dan tertagih di
+kasir farmasi. (FA-140, FA-144)
+AC-41
+Pembelian OTC untuk obat golongan bebas
+terbatas.
+Transaksi memerlukan otorisasi/PIN apoteker pengawas
+sebelum selesai; tanpa itu transaksi tidak dapat difinalisasi.
+(FA-143, RL-27)
+AC-42
+Percobaan mencari obat golongan keras/narkotika
+di jalur pencarian OTC.
+Tidak muncul di hasil pencarian OTC sama sekali (hard-stop di
+level sistem). (FA-141, RL-26)
+AC-43
+Apoteker membuat SP untuk obat yang punya dua
+supplier terdaftar dengan harga berbeda.
+Sistem menyarankan supplier termurah/prioritas, apoteker tetap
+dapat memilih supplier lain. (FA-150, FA-151)
+AC-44
+Dua batch obat yang sama dengan harga beli
+berbeda; batch dengan ED lebih dekat (harga lebih
+murah) keluar lebih dulu sesuai FEFO.
+Cost margin yang tercatat mengikuti cost_unit batch yang
+keluar (FIFO cost), bukan rata-rata seluruh batch. (FA-160,
+FA-161, FA-162)
+21. Register Keputusan
+Daftar ini memisahkan apa yang sudah pasti, apa yang masih rekomendasi, dan apa yang belum dijawab. Tim
+hendaknya tidak membangun asumsi sebagai keputusan final.
+21.1 Keputusan final pemilik
+ID
+Keputusan
+F-01
+Kartu stok dan pelaporan SIPNAP built-in; tidak ada pekerjaan farmasi di luar sistem.
+F-02
+Sisa resep dihitung otomatis; farmasis dapat menampilkan resep as is dengan det/detur, ne det/ne detur, iter + angka
+rujukan.
+F-03
+Resep menampilkan nama dan no RM yang dapat diklik menuju rekam medis.
+F-04
+PIO tercatat tetapi opsional.
+F-05
+Stok bahan racik dan obat jadi disatukan; ada flag bila pemakaian tidak wajar (mis. 7,25 tablet).
+F-06
+Harga jual dan diskon (keluarga/karyawan; persen atau nominal) diset dari faktur; ada komponen kemasan dan
+embalase; pembayaran di kasir farmasi.
+
+===== PAGE 45 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 45
+ID
+Keputusan
+F-07
+Konversi dosis mg ke unit sediaan otomatis.
+F-08
+Etiket dicetak otomatis dari data resep.
+F-09
+Notifikasi faktur H-7 sebelum jatuh tempo, masuk kontrabon, pembayaran hanya pada hari tertentu; ada daftar ceklis
+pekerjaan.
+F-10
+Alur dokter: antrian khusus, vital dari perawat masuk RM, anamnesis/diagnosis, tombol tindakan (resep, rujukan,
+surat sakit, tindakan) terkirim ke divisi tujuan.
+F-11
+Resep berupa lembar kosong tanpa template; hanya pengingat iter 1/2/3 atau ne iter.
+F-12
+Resep dikirim ke farmasi sebagai dokumen berkop resmi (sesuai regulasi yang diverifikasi), berwujud elektronik.
+F-13
+Harga kasir dari master, void dengan persetujuan kedua, rekonsiliasi lintas modul otomatis, audit trail permanen.
+F-14
+Dokter melihat ketersediaan obat di farmasi saat meresepkan; ada memo terarah antar divisi dan pengumuman ke
+semua divisi.
+F-15
+Pencatatan suhu kulkas vaksin manual (klinik punya alat pemantau tanpa sensor IoT); integrasi sensor otomatis
+menjadi pengembangan Fase 4, bukan versi awal.
+F-16
+BUD racikan = nilai terkecil antara durasi resep dan batas stabilitas maksimum per jenis sediaan (default 7 hari,
+mengikuti kebiasaan klinik, dapat disesuaikan apoteker).
+F-17
+Instruksi penyimpanan racikan menjadi field wajib etiket racikan sejak versi awal.
+F-18
+Pemusnahan obat wajib disertai berita acara lengkap, diketahui/disetujui apoteker penanggung jawab, dijadwalkan
+berkala per semester.
+F-19
+Ada jalur penjualan OTC tanpa Visit/pendaftaran resepsionis, berlaku juga untuk non-pasien/pengantar; obat bebas
+terbatas wajib pengawasan langsung apoteker; obat keras/narkotika/psikotropika tertutup dari jalur ini.
+F-20
+Master supplier mendukung multi-PBF per obat dengan saran harga termurah/prioritas; keputusan akhir tetap di
+apoteker/asisten farmasi.
+F-21
+Metode costing: FIFO cost mengikuti urutan FEFO (bukan average cost).
+21.2 Asumsi yang perlu dikonfirmasi
+ID
+Asumsi / rekomendasi
+Catatan
+A-01
+Farmasis tidak mengoreksi isi resep; baris ambigu/tak tersedia
+dikembalikan ke dokter.
+Konsisten dengan batasan medikolegal;
+menunggu konfirmasi.
+A-02
+Status stok untuk dokter bersifat kualitatif; angka detail lewat klik lanjutan.
+Menjaga independensi keputusan
+medis.
+A-03
+Permintaan pengadaan dokter melengkapi (bukan menggantikan) defecta
+otomatis.
+Bagian 15.
+A-04
+Cuti dokter terhubung ke jadwal praktik; pengumuman lain hanya
+informasi.
+Bagian 15.
+A-05
+Ambang selisih kas; siapa menyetujui void (supervisor vs owner di atas
+ambang).
+Bagian 13.4.
+A-06
+Penanganan sisa fraksi racikan (susut racik vs dipakai racikan berikutnya).
+Bagian 12.6.
+A-07
+Margin standar, margin minimum, nilai kemasan dan embalase.
+Bagian 12.4.
+A-08
+Riwayat lintas dokter untuk pasien yang sedang diterima diizinkan; pasien
+di luar antrian butuh alasan (break-glass).
+Bagian 6.
+A-09
+Pembedaan etiket putih/biru sesuai konvensi kefarmasian.
+Konfirmasi warna per klinik.
+A-10
+Default satu pasien aktif per dokter pada Terima Pasien.
+DR-02; dapat diubah.
+
+===== PAGE 46 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 46
+ID
+Asumsi / rekomendasi
+Catatan
+A-11
+Jumlah tingkat notifikasi suhu vaksin (satu tingkat breach vs bertingkat
+seperti notifikasi ED) dan daftar penerima alert selain apoteker.
+Bagian 12.12; default diusulkan satu
+tingkat untuk versi manual.
+A-12
+Siapa saksi yang disyaratkan pada berita acara pemusnahan
+non-narkotika (apakah tetap perlu saksi, atau cukup apoteker penanggung
+jawab).
+Bagian 12.14; narkotika/psikotropika
+mengikuti syarat regulasi tersendiri.
+21.3 Pertanyaan terbuka
+ID
+Pertanyaan
+Q-01
+Siapa yang menyetujui dan mengeksekusi pembayaran ke supplier (owner, manajer, atau peran keuangan baru)?
+Q-02
+Apakah order laboratorium dan radiologi masuk cakupan, dan kapan?
+Q-03
+Apakah klaim BPJS/asuransi diperlukan?
+Q-04
+Skala klinik: satu cabang atau lebih; jumlah dokter, kasir, dan perkiraan volume harian?
+Q-05
+Bentuk kanal reservasi/konsultasi online (aplikasi, web, WhatsApp) dan apakah pasien dapat melihat riwayatnya
+sendiri?
+Q-06
+Apakah perlu kunci pasien (ruang/kursi) bila satu dokter dapat menerima lebih dari satu pasien bersamaan?
+Q-07
+Target RPO/RTO untuk pencadangan dan pemulihan.
+Q-08
+Hasil verifikasi regulasi: format kop resep, tanda tangan elektronik, retensi, SIPNAP, interoperabilitas, cold chain,
+pemusnahan, penjualan OTC.
+Q-09
+Jadwal pasti pemusnahan per semester (bulan berapa saja dalam setahun)?
+22. Fase Implementasi yang Diusulkan
+ASUMSI / REKOMENDASI - PERLU KONFIRMASI PEMILIK
+Urutan berikut adalah usulan agar nilai kontrol cepat terasa dan risiko rendah. Urutan dapat disesuaikan pemilik
+dan tim; yang tidak boleh ditunda adalah fondasi (Fase 0) dan kontrol dasar keuangan/stok pada Fase 1.
+Fase
+Isi
+Alasan
+Fase 0: Fondasi
+Autentikasi, RBAC dan role kustom, audit log append-only, master
+data (pasien, obat, layanan, harga, supplier), infrastruktur notifikasi
+dan cetak, mesin tugas, mesin status/Order.
+Semua modul bergantung pada
+ini; audit dan izin tidak dapat
+ditambahkan belakangan.
+Fase 1: Alur inti
+pasien
+Pendaftaran dan antrian, intake perawat, RM dan workspace dokter,
+Order engine, e-resep lembar kosong (parsing + panel konfirmasi),
+farmasi inti (stok FIFO/FEFO, faktur, dispensing, etiket,
+harga/diskon), kasir dua titik (shift, void, rekonsiliasi dasar), jalur
+OTC dasar.
+Membuat klinik dapat beroperasi
+penuh dengan kontrol dasar.
+Fase 2: Klinis
+khusus dan
+kontrol lanjutan
+Odontogram dan rencana perawatan, growth chart dan imunisasi,
+SP/defecta otomatis dan multi-supplier, kontrabon H-7, SIPNAP,
+mesin aturan anomali, checklist tugas, memo dan broadcast, vaksin
+(pencatatan manual), BUD racikan, pemusnahan berkala.
+Menyempurnakan kekhususan
+klinik dan menghidupkan deteksi
+anomali.
+Fase 3: Dashboard
+dan maintenance
+Dashboard owner/manajer, laporan margin dan utilisasi,
+maintenance alat (termasuk kulkas vaksin), SDM/shift.
+Bergantung pada data yang
+sudah terkumpul stabil.
+Fase 4: Integrasi
+eksternal
+Payment gateway/EDC, interoperabilitas nasional, integrasi SIPNAP
+bila tersedia, tanda tangan elektronik tersertifikasi bila diwajibkan,
+sensor suhu kulkas vaksin (IoT).
+Bergantung pada hasil verifikasi
+regulasi (Q-08) dan kesiapan
+infrastruktur klinik.
+
+===== PAGE 47 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 47
+23. Glosarium
+Istilah
+Arti
+Defecta
+Daftar kebutuhan obat yang stoknya menipis dan perlu dipesan.
+SP (Surat Pesanan)
+Dokumen pemesanan obat ke PBF/distributor; ada SP khusus untuk narkotika, psikotropika,
+prekursor.
+PBF
+Pedagang Besar Farmasi (distributor obat).
+Faktur
+Dokumen tagihan/pengiriman dari supplier saat barang datang.
+Kontrabon
+Proses penukaran/pengumpulan faktur untuk dijadwalkan pembayarannya pada hari tertentu.
+Kartu stok
+Catatan mutasi dan saldo stok per item (idealnya per batch).
+ED
+Expired date (tanggal kadaluarsa).
+BUD
+Beyond-Use Date: batas waktu pakai sediaan racikan, berbeda dan umumnya lebih pendek
+dari ED obat asal.
+FEFO
+First Expired First Out: yang lebih dulu kedaluwarsa dikeluarkan lebih dulu (urutan fisik).
+FIFO cost
+Metode harga pokok yang mengikuti urutan batch yang secara fisik keluar lebih dulu.
+Batch
+Nomor produksi/lot obat dari pabrik.
+Resep racikan / non-racikan
+Obat yang dicampur/diracik oleh farmasi / obat jadi yang diserahkan langsung.
+Embalase
+Biaya penyiapan/pembungkus resep yang dibebankan sesuai kebijakan apotek.
+Etiket
+Label pada kemasan obat berisi nama pasien, obat, aturan pakai; umumnya putih untuk obat
+dalam dan biru untuk obat luar.
+PIO
+Pelayanan Informasi Obat kepada pasien saat penyerahan.
+Det / ne det, iter
+Notasi salinan resep: diserahkan / tidak diserahkan; iter = dapat diulang (angka menunjukkan
+jumlah pengulangan).
+Telaah resep
+Pemeriksaan resep sebelum dilayani (administratif, farmasetik, klinis).
+SIPNAP
+Sistem pelaporan narkotika dan psikotropika.
+APA
+Apoteker Penanggung Jawab.
+Cold chain
+Rantai dingin: rangkaian penyimpanan dan distribusi vaksin pada suhu terkendali agar
+potensinya terjaga.
+VVM
+Vaccine Vial Monitor: indikator panas pada label vial vaksin yang menunjukkan paparan
+panas kumulatif.
+OTC
+Over the counter: penjualan obat bebas/bebas terbatas tanpa resep.
+Encounter / Visit
+Satu kunjungan pasien; poros semua data klinis dan finansial.
+RM
+Rekam medis.
+Odontogram
+Peta kondisi gigi pasien.
+Notasi FDI
+Sistem penomoran gigi internasional dua digit.
+Growth chart
+Grafik pertumbuhan anak berbasis persentil/z-score.
+RBAC
+Role-Based Access Control: hak akses berdasarkan role.
+Least privilege
+Prinsip memberi akses minimum yang diperlukan.
+Segregation of duties
+Pemisahan tugas agar pembuat dan penyetuju bukan orang yang sama.
+Append-only
+Data hanya ditambah, tidak diubah atau dihapus.
+
+===== PAGE 48 =====
+Spesifikasi Sistem Manajemen Klinik & Farmasi  |  v1.1 draft  |  15 Oktober 2026
+Halaman 48
+Istilah
+Arti
+Idempoten
+Operasi yang diulang tidak menghasilkan efek ganda.
+Soft-stop / hard-stop
+Peringatan yang dapat dilewati dengan alasan / pemblokiran yang tidak dapat dilewati.
+Snapshot harga
+Salinan harga pada saat transaksi agar histori tidak berubah bila master berubah.
+Break-glass
+Akses darurat di luar hak normal dengan alasan wajib dan peringatan.
+Dokumen ini merangkum seluruh pembahasan kebutuhan: kerangka role, modul Farmasi (termasuk vaksin, BUD racikan,
+pemusnahan, OTC, multi-supplier, dan costing), modul Kasir, alur pasien, dan modul Dokter. Bila ada pertentangan antara
+dokumen ini dan pemahaman engineer, tanyakan kepada pemilik kebutuhan; jangan mengambil asumsi diam-diam.

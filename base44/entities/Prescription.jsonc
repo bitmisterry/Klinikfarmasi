@@ -1,0 +1,235 @@
+{
+  "name": "Prescription",
+  "type": "object",
+  "properties": {
+    "prescription_number": {
+      "type": "string",
+      "description": "Nomor resep, mis. R20260921001"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient (kosong untuk resep eksternal walk-in)"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "queue_entry_id": {
+      "type": "string"
+    },
+    "doctor_id": {
+      "type": "string"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "prescription_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "Internal",
+        "Eksternal"
+      ],
+      "default": "Internal"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Baru",
+        "Diresepkan",
+        "Dispensing",
+        "Selesai Dispensing",
+        "Billed",
+        "Paid",
+        "Batal"
+      ],
+      "default": "Baru"
+    },
+    "is_racikan": {
+      "type": "boolean",
+      "default": false,
+      "description": "True jika resep mengandung racikan"
+    },
+    "racikan_template_id": {
+      "type": "string",
+      "description": "Ref RacikanTemplate jika resep racikan"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string",
+            "description": "Signatur, mis. 3x1 tablet"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "substituted": {
+            "type": "boolean",
+            "default": false
+          },
+          "substituted_from": {
+            "type": "string"
+          },
+          "converted_units": {
+            "type": "number",
+            "description": "Jumlah unit sediaan riil hasil konversi dosis otomatis"
+          },
+          "is_odd_fraction": {
+            "type": "boolean",
+            "default": false,
+            "description": "True jika hasil konversi dosis pecahan ganjil"
+          },
+          "label_override": {
+            "type": "object",
+            "description": "Override etiket oleh farmasis \u2014 tidak mengubah data resep dokter",
+            "properties": {
+              "usage_instruction": {
+                "type": "string",
+                "description": "Aturan pakai untuk etiket (override signa)"
+              },
+              "storage_note": {
+                "type": "string",
+                "description": "Catatan penyimpanan etiket (kosong = tidak tampil)"
+              },
+              "pio_note": {
+                "type": "string",
+                "description": "Info PIO untuk etiket"
+              }
+            }
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Catatan untuk apoteker"
+    },
+    "transaction_id": {
+      "type": "string"
+    },
+    "tebus_status": {
+      "type": "string",
+      "enum": [
+        "Seluruhnya",
+        "Sebagian",
+        "Tidak Ditebus"
+      ],
+      "description": "Status tebus resep: seluruhnya ditebus, sebagian, atau tidak ditebus"
+    },
+    "tebus_notation": {
+      "type": "string",
+      "description": "Notasi kefarmasian: det (diberikan), ne det (tidak diberikan), iter+N (ulang)"
+    },
+    "tebus_remaining": {
+      "type": "number",
+      "default": 0,
+      "description": "Jumlah item obat yang belum diserahkan"
+    },
+    "pio_recorded": {
+      "type": "object",
+      "description": "Pencatatan Pelayanan Informasi Obat (opsional)",
+      "properties": {
+        "cara_pakai": {
+          "type": "string"
+        },
+        "efek_samping": {
+          "type": "string"
+        },
+        "interaksi": {
+          "type": "string"
+        },
+        "catatan": {
+          "type": "string"
+        },
+        "recorded_by": {
+          "type": "string"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "physical_scan_url": {
+      "type": "string",
+      "description": "URL foto/scan resep fisik (untuk resep eksternal)"
+    },
+    "retention_category": {
+      "type": "string",
+      "enum": [
+        "Standar",
+        "Narkotika"
+      ],
+      "default": "Standar",
+      "description": "Kategori retensi arsip: Standar (2 tahun) atau Narkotika (5 tahun)"
+    }
+  },
+  "required": [
+    "patient_name",
+    "prescription_date",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Asisten Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "name": "DoctorChecklist",
+  "type": "object",
+  "properties": {
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref User dokter"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "checklist_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean",
+            "default": false
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "Review",
+              "Pemeriksaan",
+              "Farmasi",
+              "Catatan",
+              "Jadwal"
+            ],
+            "default": "Review"
+          }
+        }
+      }
+    },
+    "completed_count": {
+      "type": "number",
+      "default": 0
+    },
+    "total_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "doctor_id",
+    "checklist_date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

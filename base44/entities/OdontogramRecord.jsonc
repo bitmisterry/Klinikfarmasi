@@ -1,0 +1,32 @@
+{
+  "name": "OdontogramRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "tooth_number": {
+      "type": "string",
+      "description": "FDI notation, mis. 11, 21, 36, 46"
+    },
+    "tooth_type": {
+      "type": "string",
+      "enum": [
+        "Incisor",
+        "Canine",
+        "Premolar",
+        "Molar"
+      ],
+      "description": "Jenis gigi"
+    },
+    "arch": {
+      "type": "string",
+      "enum": [
+        "Upper",
+        "Lower"
+      ],
+      "description": "Rahang atas/bawah"

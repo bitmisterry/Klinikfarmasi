@@ -1,0 +1,223 @@
+{
+  "name": "MedicalRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "queue_entry_id": {
+      "type": "string"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "doctor_id": {
+      "type": "string"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "chief_complaint": {
+      "type": "string",
+      "description": "Keluhan utama"
+    },
+    "subjective": {
+      "type": "string",
+      "description": "HPI / history of present illness \u2014 anamnesis lengkap (SOAP Subjective)"
+    },
+    "vital signs_bp": {
+      "type": "string",
+      "description": "Tekanan darah, mis. 120/80"
+    },
+    "vital_signs_temp": {
+      "type": "number",
+      "description": "Suhu (C)"
+    },
+    "vital_signs_pulse": {
+      "type": "number",
+      "description": "Nadi (bpm)"
+    },
+    "vital_signs_rr": {
+      "type": "number",
+      "description": "Frekuensi napas"
+    },
+    "vital_signs_weight": {
+      "type": "number",
+      "description": "Berat badan (kg)"
+    },
+    "vital_signs_height": {
+      "type": "number",
+      "description": "Tinggi badan (cm)"
+    },
+    "vital_signs_head_circumference": {
+      "type": "number",
+      "description": "Lingkar kepala (cm)"
+    },
+    "bmi": {
+      "type": "number",
+      "description": "Body Mass Index (auto-calculated)"
+    },
+    "physical_exam": {
+      "type": "string",
+      "description": "Pemeriksaan fisik (SOAP Objective)"
+    },
+    "diagnosis": {
+      "type": "string",
+      "description": "Diagnosis ICD-10 / narasi (SOAP Assessment)"
+    },
+    "diagnosis_code": {
+      "type": "string",
+      "description": "Kode ICD-10"
+    },
+    "procedures": {
+      "type": "array",
+      "description": "Tindakan medis dengan billing",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "fee": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "tindakan_total": {
+      "type": "number",
+      "description": "Total biaya tindakan",
+      "default": 0
+    },
+    "treatment_plan": {
+      "type": "string",
+      "description": "Rencana terapi/tindakan (SOAP Plan)"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal kunjungan ulang"
+    },
+    "follow_up_instructions": {
+      "type": "string"
+    },
+    "patient_education": {
+      "type": "string",
+      "description": "Edukasi pasien"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "patient_name",
+    "visit_date"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        },
+        {
+          "data.doctor_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Umum"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Anak"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Penyakit Dalam"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Gigi"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Locum"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Perawat"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Asisten Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.doctor_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

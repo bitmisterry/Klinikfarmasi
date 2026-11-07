@@ -1,0 +1,66 @@
+{
+  "name": "Memo",
+  "type": "object",
+  "properties": {
+    "from_user_id": {
+      "type": "string"
+    },
+    "from_user_name": {
+      "type": "string"
+    },
+    "target_role": {
+      "type": "string",
+      "description": "Role spesifik atau 'All' untuk semua staff"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Penting",
+        "Mendesak"
+      ],
+      "default": "Normal"
+    },
+    "is_pinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array user ID yang sudah membaca"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL lampiran foto hasil pemeriksaan / dokumen medis"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Nama file lampiran"
+    }
+  },
+  "required": [
+    "from_user_name",
+    "target_role",
+    "subject",
+    "body"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

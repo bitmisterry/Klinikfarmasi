@@ -1,0 +1,129 @@
+{
+  "name": "PaymentSchedule",
+  "type": "object",
+  "properties": {
+    "schedule_number": {
+      "type": "string",
+      "description": "Nomor jadwal bayar, mis. JB-2026-001"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "invoice_id": {
+      "type": "string",
+      "description": "Ref SupplierInvoice"
+    },
+    "invoice_number": {
+      "type": "string"
+    },
+    "po_number": {
+      "type": "string"
+    },
+    "planned_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Tanggal rencana pembayaran"
+    },
+    "amount": {
+      "type": "number",
+      "default": 0,
+      "description": "Jumlah yang dijadwalkan"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Terjadwal",
+        "Dibayar",
+        "Ditunda",
+        "Dibatalkan"
+      ],
+      "default": "Terjadwal"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tunai",
+        "Transfer",
+        "Debit",
+        "Cek",
+        "BG"
+      ],
+      "default": "Transfer"
+    },
+    "reference_number": {
+      "type": "string",
+      "description": "No. bukti transfer / cek / BG"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schedule_number",
+    "supplier_name",
+    "planned_date",
+    "amount",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Finance"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Finance"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

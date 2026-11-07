@@ -1,0 +1,79 @@
+{
+  "name": "Appointment",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "patient_user_id": {
+      "type": "string",
+      "description": "User ID if booked via portal"
+    },
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref Staff dokter"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "appointment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "time_slot": {
+      "type": "string",
+      "description": "Jam, mis. 09:00"
+    },
+    "poli": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Terjadwalkan",
+        "Dikonfirmasi",
+        "Hadir",
+        "Selesai",
+        "Dibatalkan",
+        "No-Show",
+        "Perlu Reschedule"
+      ],
+      "default": "Terjadwalkan"
+    },
+    "queue_entry_id": {
+      "type": "string",
+      "description": "Ref QueueEntry jika sudah check-in"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "Portal",
+        "Walk-in",
+        "Telepon"
+      ],
+      "default": "Portal"
+    }
+  },
+  "required": [
+    "patient_name",
+    "appointment_date",
+    "time_slot",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

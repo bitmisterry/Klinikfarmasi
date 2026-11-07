@@ -1,0 +1,592 @@
+
+===== PAGE 1 =====
+PETUNJUK TEKNIS
+Demo End-to-End
+Software Klinik
+Panduan implementasi alur pasien lintas-role, integrasi data, status
+proses, skenario uji, dan kriteria penerimaan demo.
+UNTUK: Tim IT, Software Developer, QA/Tester, Product Owner
+VERSI: 1.0    STATUS: Draft teknis untuk diselaraskan dengan sistem
+yang sudah ada
+Tujuan utama: membuktikan bahwa satu pasien dan satu episode kunjungan dapat bergerak
+melalui proses klinik secara konsisten, dengan data yang terhubung dan dashboard setiap
+role yang memperlihatkan status sesuai kewenangannya.
+Dokumen ini adalah panduan implementasi dan pengujian. Nama status, modul, serta urutan proses final
+harus dipetakan ke struktur software yang sudah ada; jangan membuat status atau modul baru tanpa analisis
+dampak.
+
+===== PAGE 2 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 2
+1. Tujuan, Ruang Lingkup, dan Prinsip
+1.1 Tujuan
+●
+Mendemonstrasikan satu perjalanan pasien dari registrasi sampai penyelesaian kunjungan dan transaksi.
+●
+Memastikan data dan status berpindah antar-role melalui proses sistem yang nyata, bukan hanya
+perpindahan halaman atau data yang diubah manual.
+●
+Mempertahankan kontrol akses, pemisahan dashboard, audit trail, dan kewenangan yang sudah tersedia.
+●
+Menyediakan demo yang dapat diulang, diverifikasi, dan digunakan oleh manajemen untuk menilai
+kesiapan produk.
+1.2 Ruang lingkup minimum
+Area
+Termasuk
+Di luar jalur utama / opsional
+Front office
+Pencarian/pendaftaran pasien, registrasi kunjungan,
+pemilihan dokter/layanan.
+Pendaftaran massal, integrasi eksternal.
+Perawat / rekam
+medis
+Keluhan, alergi, tanda vital, pemeriksaan awal,
+penyimpanan data.
+Perangkat medis otomatis.
+Dokter
+Antrean, anamnesis, diagnosis, tindakan, resep dan
+order terkait.
+Kasus klinis kompleks.
+Farmasi
+Antrean resep, verifikasi, penyiapan, penyerahan,
+status dan item obat.
+Pengadaan dan stok lanjutan bila tidak
+diperlukan demo.
+Kasir
+Tagihan, rincian biaya, pembayaran, bukti transaksi.
+Rekonsiliasi akuntansi lanjutan.
+Layanan lain
+Lab/tindakan/rujukan ditunjukkan sebagai cabang
+jika dipilih dokter.
+Tidak wajib dipaksakan ke setiap pasien.
+1.3 Prinsip implementasi
+●
+Satu episode kunjungan: seluruh aktivitas harus terkait dengan identitas pasien dan visit/encounter yang
+sama.
+●
+Single source of truth: modul berikutnya menggunakan data tersimpan dari proses sebelumnya, bukan
+salinan yang diketik ulang tanpa alasan.
+●
+Event/status yang jelas: setiap transisi memiliki pemicu, prasyarat, aktor, timestamp, dan hasil.
+●
+Role-based access: dashboard dan tindakan yang tersedia mengikuti hak akses yang telah ditetapkan.
+●
+Auditability: perubahan penting dapat ditelusuri ke pengguna, waktu, dan sumber perubahan.
+●
+Demo repeatable: gunakan data uji dan prosedur reset yang aman; jangan menggunakan data pasien
+nyata.
+
+===== PAGE 3 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 3
+2. Alur Bisnis End-to-End
+Gunakan alur di bawah sebagai golden path awal. Cabang lab, tindakan, dan rujukan dipicu sesuai skenario
+klinis; bukan langkah wajib bagi semua kunjungan.
+No
+.
+Role / modul
+Aksi
+Hasil yang diharapkan
+01
+Resepsionis
+Daftarkan/cari pasien; buat kunjungan; pilih
+poli/dokter/jenis kunjungan.
+Kunjungan tercatat dan memiliki ID unik;
+pasien masuk proses berikutnya.
+02
+Perawat / RM
+Buka kunjungan; isi keluhan, alergi, tanda vital,
+dan pemeriksaan awal; simpan.
+Data tersimpan dan status pemeriksaan awal
+diperbarui.
+03
+Antrean dokter
+Sistem memasukkan kunjungan ke antrean
+dokter/poli yang sesuai setelah prasyarat
+terpenuhi.
+Pasien terlihat di dashboard dokter yang tepat
+dengan urutan/status yang benar.
+04
+Dokter
+Panggil pasien; buka rekam medis; isi
+anamnesis, diagnosis, rencana, dan tindakan;
+finalisasi sesuai aturan.
+Catatan dokter tersimpan; order/resep terkait
+tercipta dan terhubung ke kunjungan.
+05
+Modul terkait
+Terima order lab, tindakan, atau rujukan bila
+dibuat; catat proses/hasil sesuai ruang lingkup
+demo.
+Status order dapat ditelusuri; hasil atau status
+kembali ke episode kunjungan.
+06
+Farmasi
+Terima resep; verifikasi; siapkan item; catat
+jumlah yang diserahkan; tandai penyerahan.
+Status resep dan item penyerahan diperbarui;
+data untuk tagihan tersedia sesuai aturan.
+07
+Kasir
+Konsolidasikan komponen tagihan; cek rincian;
+catat metode dan nominal pembayaran;
+terbitkan bukti.
+Transaksi tersimpan; status pembayaran
+konsisten dengan nominal yang dibayar.
+08
+Penyelesaian
+Periksa seluruh pekerjaan wajib, status
+pembayaran, dan aturan penutupan kunjungan.
+Kunjungan ditutup hanya jika prasyarat
+penyelesaian terpenuhi.
+Aturan urutan proses
+●
+Urutan aktual harus mengikuti SOP klinik dan konfigurasi produk. Contoh ini bukan pengganti keputusan
+operasional klinik.
+●
+Kasir dapat bekerja sebelum atau sesudah penyerahan farmasi sesuai kebijakan klinik. Untuk golden path
+demo, tetapkan satu aturan yang konsisten.
+●
+Jika dokter membuat beberapa output sekaligus, tiap output harus memiliki status dan penerima proses
+yang sesuai.
+●
+Jangan menandai kunjungan selesai jika masih ada layanan wajib yang belum selesai atau tagihan belum
+memenuhi aturan penutupan.
+
+===== PAGE 4 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 4
+3. Struktur Data dan Relasi Minimum
+Nama tabel berikut bersifat konseptual. Petakan ke entitas, tabel, service, dan ID yang sudah digunakan
+aplikasi; jangan menggandakan master data yang telah tersedia.
+Entitas konseptual
+Kunci/relasi minimum
+Fungsi
+Patient
+patient_id
+Identitas pasien/master data; tidak dibuat ulang untuk
+setiap kunjungan.
+Encounter / Visit
+encounter_id, patient_id, provider/poli,
+visit_type
+Satu episode pelayanan; menjadi penghubung utama
+seluruh aktivitas.
+Queue Item
+queue_id, encounter_id,
+assigned_provider, status
+Mengelola antrean, pemanggilan, dan urutan layanan.
+Clinical Record
+record_id, encounter_id, author_user_id
+Keluhan, alergi, tanda vital, anamnesis, diagnosis,
+catatan klinis.
+Order / Service
+Request
+order_id, encounter_id, order_type,
+ordering_user
+Permintaan lab, tindakan, rujukan, atau layanan lain.
+Prescription
+prescription_id, encounter_id,
+prescriber_id
+Header resep; item obat disimpan sebagai detail terkait.
+Prescription Item
+item_id, prescription_id, drug_id,
+quantity
+Obat, aturan pakai, jumlah, status
+penyiapan/penyerahan.
+Dispense /
+Handover
+dispense_id, prescription_id, item_id,
+pharmacist_id
+Bukti proses penyiapan dan penyerahan obat.
+Invoice / Charge
+invoice_id, encounter_id,
+charge_source_id
+Komponen tagihan; harus memiliki sumber dan aturan
+anti-duplikasi.
+Payment
+payment_id, invoice_id, amount,
+method, status
+Pembayaran dan status pelunasan; mendukung
+pembayaran parsial bila produk mengizinkan.
+Audit Event
+event_id, actor_id, entity, entity_id,
+timestamp
+Jejak perubahan penting, termasuk status dan koreksi.
+Aturan integritas data
+●
+Setiap modul menyimpan foreign key atau referensi yang dapat ditelusuri ke encounter_id yang sama.
+●
+Gunakan ID unik dan aturan idempotensi agar klik ulang/retry tidak membuat order, resep, atau tagihan
+ganda.
+●
+Jangan menghapus jejak transaksi klinis/keuangan secara diam-diam; gunakan mekanisme batal/koreksi
+dengan alasan dan audit trail.
+●
+Nominal tagihan harus berasal dari aturan harga dan item layanan/obat yang valid; hindari menghitung
+biaya yang sama dari dua sumber.
+●
+Pisahkan status resep dari status pembayaran dan status kunjungan; ketiganya tidak selalu identik.
+
+===== PAGE 5 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 5
+4. Status Proses dan Transisi
+Status di bawah adalah contoh baseline untuk diskusi. Developer harus menginventarisasi status yang ada,
+menyepakati nama final, dan mendokumentasikan transisi yang sah.
+Objek
+Contoh status
+Transisi/pemicu
+Validasi penting
+Kunjungan
+Registered → Waiting → In
+Service → Ready to Close →
+Closed
+Registrasi, masuk antrean,
+pelayanan, pemeriksaan
+prasyarat, penutupan.
+Closed hanya jika prasyarat
+klinis/administratif sesuai kebijakan
+terpenuhi.
+Pemeriksaan
+awal
+Not Started → In Progress →
+Completed
+Perawat mulai dan menyimpan
+pemeriksaan.
+Data wajib sesuai konfigurasi;
+catatan belum selesai tidak
+dianggap final.
+Antrean
+Waiting → Called → In
+Consultation → Completed
+Dokter memanggil, memulai, lalu
+menyelesaikan proses konsultasi.
+Hanya role berwenang yang dapat
+memanggil/mengubah status.
+Resep
+Created → Sent to Pharmacy
+→ Verified → Prepared →
+Dispensed
+Dokter finalisasi; farmasi
+memproses resep.
+Perubahan harus tercatat; resep
+batal/parsial ditangani eksplisit.
+Order
+lab/tindakan
+Ordered → Accepted → In
+Progress →
+Completed/Cancelled
+Order dibuat dan diproses unit
+terkait.
+Hasil/status terhubung ke order dan
+encounter asal.
+Tagihan
+Draft → Posted → Partially
+Paid/Paid/Voided
+Charge terbentuk, diverifikasi,
+dibayar atau dikoreksi.
+Void/koreksi wajib memiliki alasan
+dan jejak audit.
+Format spesifikasi setiap transisi
+Untuk setiap status, dokumentasikan: (1) status asal, (2) aksi pemicu, (3) role yang
+berwenang, (4) prasyarat/validasi, (5) perubahan data, (6) status tujuan, (7) event
+notifikasi/dashboard, (8) audit event, dan (9) penanganan gagal/retry.
+
+===== PAGE 6 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 6
+5. Perilaku Dashboard dan Hak Akses
+Dashboard
+Informasi minimum
+Perilaku yang diuji
+Resepsionis
+Pasien, kunjungan aktif, dokter/poli, status
+registrasi.
+Kunjungan yang baru disimpan muncul dengan status
+benar; tidak membuat episode ganda saat halaman
+di-refresh.
+Perawat / RM
+Daftar kunjungan yang perlu pemeriksaan
+awal, data klinis terkait.
+Setelah disimpan, status dan data dapat dibaca role
+yang berwenang.
+Dokter
+Antrean dokter/poli, waktu, status,
+ringkasan rekam medis.
+Pasien masuk antrean yang tepat setelah prasyarat
+terpenuhi; perubahan status terlihat tanpa salah
+penugasan.
+Farmasi
+Resep masuk, item, alergi/peringatan
+relevan, status penyiapan.
+Resep muncul setelah finalisasi dokter; status
+berubah mengikuti aksi farmasi.
+Kasir
+Tagihan per kunjungan, rincian komponen,
+pembayaran, saldo.
+Charge yang sah muncul satu kali; pembayaran
+mengubah status secara konsisten.
+Admin/Manajemen
+Ringkasan operasional sesuai izin, indikator
+antrean dan transaksi.
+Tidak boleh melihat/mengubah data di luar cakupan
+izin; angka agregat konsisten dengan data sumber.
+Checklist keamanan dan kewenangan
+●
+Uji akses dengan akun terpisah untuk setiap role, bukan hanya mengganti label role di satu akun.
+●
+Pastikan API/backend memvalidasi kewenangan; menyembunyikan tombol di frontend saja tidak cukup.
+●
+Role tidak boleh membuka atau mengubah rekam medis/transaksi yang tidak termasuk kewenangannya.
+●
+Perubahan penting menyimpan actor, timestamp, dan nilai/status yang berubah sesuai kebijakan audit.
+●
+Data demo harus fiktif dan tidak mengandung informasi pasien nyata.
+
+===== PAGE 7 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 7
+6. Skenario Golden Path untuk Demo
+Gunakan satu pasien uji dengan identitas fiktif, satu kunjungan baru, satu dokter, satu resep, dan satu
+pembayaran. Tambahkan order lab/tindakan/rujukan sebagai cabang jika ingin menunjukkan integrasi
+tambahan.
+Pra-demo
+●
+Siapkan akun uji untuk resepsionis, perawat, dokter, farmasi, kasir, dan observer/manajemen.
+●
+Pastikan master dokter, poli, layanan, obat, harga, metode pembayaran, dan konfigurasi antrean tersedia.
+●
+Pastikan tidak ada data uji lama yang menyebabkan pasien ganda atau antrean tertukar.
+●
+Catat ID pasien dan encounter yang akan digunakan; siapkan prosedur reset/arsip data demo.
+●
+Buka dashboard role yang akan digunakan dan pastikan koneksi serta refresh berjalan.
+Langkah demonstrasi dan bukti
+Lang
+kah
+Aksi presenter
+Bukti yang harus terlihat
+1
+Login sebagai resepsionis; cari atau buat pasien; buat
+kunjungan.
+Patient ID dan encounter/visit ID; status registrasi.
+2
+Login sebagai perawat; buka kunjungan; isi keluhan,
+alergi, tanda vital; simpan.
+Data tersimpan dan status pemeriksaan awal selesai.
+3
+Buka dashboard dokter yang dituju.
+Pasien muncul pada antrean yang benar dengan encounter
+yang sama.
+4
+Dokter memanggil pasien, mengisi catatan, diagnosis,
+tindakan, dan resep.
+Catatan dokter tersimpan; prescription/order ID terkait
+encounter yang sama.
+5
+Jika dipilih, tunjukkan order lab/tindakan/rujukan pada
+modul tujuan.
+Order muncul di unit yang tepat; status dapat ditelusuri.
+6
+Farmasi verifikasi, siapkan item, catat penyerahan.
+Status resep/item dan jumlah yang diserahkan tersimpan.
+7
+Kasir membuka tagihan, memeriksa rincian,
+memproses pembayaran.
+Rincian biaya, nominal, metode, bukti transaksi, status
+pembayaran.
+8
+Tinjau status kunjungan dan audit trail.
+Status akhir sesuai aturan; semua objek dapat ditelusuri ke
+encounter yang sama.
+Aturan presenter
+●
+Jangan mengedit database langsung atau mengubah status lewat cara di luar aplikasi saat demo.
+●
+Jangan menampilkan data fiktif seolah-olah pasien nyata.
+●
+Jika langkah gagal, catat titik gagal, role, ID objek, waktu, dan hasil yang diharapkan; jangan
+menyembunyikan kegagalan.
+●
+Simpan rekaman atau screenshot bukti per langkah jika digunakan untuk sign-off internal.
+
+===== PAGE 8 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 8
+7. Rencana Pengujian dan Acceptance Criteria
+Setiap kasus uji memiliki precondition, langkah, expected result, actual result, status Pass/Fail, bukti, tester,
+dan tanggal pengujian.
+ID
+Kasus uji
+Hasil yang wajib
+Priorita
+s
+E2E-01
+Registrasi sampai antrean
+dokter
+Satu encounter terbentuk dan muncul pada antrean
+dokter/poli yang benar.
+P0
+E2E-02
+Perawat menyimpan
+pemeriksaan awal
+Data tersimpan, dapat dibaca role berwenang, dan status
+terbarui.
+P0
+E2E-03
+Dokter membuat diagnosis dan
+resep
+Catatan dan resep terhubung ke encounter; resep muncul di
+farmasi.
+P0
+E2E-04
+Farmasi menyiapkan dan
+menyerahkan
+Status serta jumlah item diserahkan tercatat dan dapat
+ditelusuri.
+P0
+E2E-05
+Tagihan dan pembayaran
+Tagihan tidak ganda; jumlah, pembayaran, saldo, dan status
+konsisten.
+P0
+E2E-06
+Cabang order
+lab/tindakan/rujukan
+Order diterima modul terkait dan status/hasil tertaut ke
+encounter.
+P1
+E2E-07
+Role tidak berwenang
+mencoba akses
+Akses ditolak di backend; tidak ada data sensitif bocor.
+P0
+E2E-08
+Klik ganda/retry saat
+menyimpan
+Tidak membuat kunjungan, resep, order, atau charge ganda.
+P0
+E2E-09
+Refresh / login role berikutnya
+Status terbaru tetap konsisten dan tersimpan di backend.
+P0
+E2E-10
+Pembatalan/koreksi transaksi
+atau resep
+Status koreksi sah, alasan tercatat, audit trail tersedia.
+P1
+Definisi kelulusan demo
+●
+Semua test P0 lulus pada lingkungan demo.
+●
+Tidak ada data pasien/kunjungan yang berpindah ke antrean atau role yang salah.
+●
+Tidak ada transaksi ganda, status palsu, atau data yang hanya muncul karena state frontend.
+●
+Setiap langkah dapat ditelusuri melalui ID objek dan audit trail yang tersedia.
+●
+Kegagalan P1 diketahui, didokumentasikan, dan tidak disamarkan sebagai fitur yang sudah selesai.
+
+===== PAGE 9 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 9
+8. Paket Pekerjaan untuk Tim Developer
+Workstream
+Deliverable
+Definition of Done
+A. Discovery &
+mapping
+Peta modul/role/status saat ini; daftar gap
+terhadap golden path.
+Tidak ada asumsi status atau entitas yang belum
+diverifikasi; gap disepakati Product Owner.
+B. Workflow & state
+Diagram alur, state transition matrix,
+prasyarat setiap transisi.
+Setiap transisi memiliki aktor, pemicu, validasi,
+hasil, dan penanganan error.
+C. Data integration
+Peta ID dan relasi encounter, clinical record,
+order, prescription, charge, payment.
+Satu episode bisa ditelusuri end-to-end; tidak ada
+duplikasi objek saat retry.
+D. Dashboard &
+permissions
+Matriks role-dashboard-action; aturan
+refresh/notifikasi.
+Data dan aksi hanya tersedia sesuai kewenangan;
+pembaruan status konsisten.
+E. QA
+automation/manual
+Test case, hasil uji, screenshot/log, daftar
+defect.
+Semua P0 lulus dan bukti sign-off tersedia.
+F. Demo readiness
+Data seed, akun demo, script presenter,
+prosedur reset, fallback plan.
+Demo dapat dijalankan ulang oleh orang lain
+mengikuti script yang sama.
+Urutan kerja yang disarankan
+1. Audit sistem yang sudah ada → 2. Petakan golden path → 3. Identifikasi gap → 4. Implementasikan integrasi
+yang belum ada → 5. Uji per modul → 6. Uji end-to-end → 7. Rehearsal demo → 8. Sign-off.
+Jangan langsung melakukan refactor besar. Pertahankan komponen yang telah bekerja dan
+lakukan perubahan minimum yang diperlukan untuk menghubungkan alur secara benar.
+
+===== PAGE 10 =====
+Petunjuk Teknis Demo End-to-End Software Klinik
+Halaman 10
+9. Format Laporan Hasil Pengujian
+Gunakan format berikut untuk setiap test case atau defect.
+Field
+Isi
+Test ID / Defect ID
+Contoh: E2E-03 atau BUG-012.
+Environment / build
+URL lingkungan, nomor versi/build, tanggal dan waktu.
+Akun/role
+Role yang digunakan; jangan mencatat password.
+Patient ID / Encounter ID
+ID data uji yang terlibat.
+Langkah reproduksi
+Urutan tindakan yang tepat untuk mengulang hasil.
+Expected result
+Hasil yang ditetapkan dalam spesifikasi.
+Actual result
+Hasil yang benar-benar terjadi.
+Bukti
+Screenshot, log, event ID, atau rekaman sesuai kebijakan.
+Severity / priority
+P0 blocker, P1 penting, P2 minor; sesuaikan definisi tim.
+PIC / status
+Penanggung jawab, Open/In Progress/Ready for Retest/Closed.
+Template sign-off
+Area
+Status
+Catatan / bukti
+Disetujui oleh
+Golden path E2E
+Pass / Fail
+........................................
+................
+Integrasi farmasi &
+kasir
+Pass / Fail
+........................................
+................
+Hak akses & audit trail
+Pass / Fail
+........................................
+................
+Repeatability demo
+Pass / Fail
+........................................
+................
+10. Keputusan dan Tindak Lanjut
+Sebelum demo eksternal, Product Owner/manajemen perlu menyetujui: (1) alur golden path final, (2) aturan
+kapan kunjungan dapat ditutup, (3) urutan farmasi-kasir yang digunakan, (4) komponen biaya yang masuk
+tagihan, (5) cabang layanan yang akan diperlihatkan, dan (6) daftar test P0 sebagai syarat rilis demo.
+Output akhir yang wajib diserahkan tim: workflow diagram; daftar entitas dan relasi; state
+transition matrix; matriks role dan kewenangan; demo script; test case dan bukti uji; daftar
+defect/gap; serta status sign-off.
+Catatan: dokumen ini adalah baseline teknis. Validasi akhir tetap harus dilakukan terhadap arsitektur, model data, SOP klinik,
+dan perilaku aplikasi yang benar-benar ada.

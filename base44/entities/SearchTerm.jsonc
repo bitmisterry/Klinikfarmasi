@@ -1,0 +1,87 @@
+{
+  "name": "SearchTerm",
+  "type": "object",
+  "properties": {
+    "canonical": {
+      "type": "string",
+      "description": "Istilah resmi, mis. 'Harga Beli / HPP Obat'"
+    },
+    "synonyms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Kata lain yang merujuk ke istilah ini"
+    },
+    "guide_id": {
+      "type": "string",
+      "description": "Ref SearchGuide jika istilah menunjuk ke panduan tertentu"
+    },
+    "page_path": {
+      "type": "string",
+      "description": "Path halaman tujuan langsung (opsional)"
+    },
+    "page_label": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "canonical",
+    "synonyms",
+    "is_active"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Owner"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

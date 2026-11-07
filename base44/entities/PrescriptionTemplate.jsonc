@@ -1,0 +1,135 @@
+{
+  "name": "PrescriptionTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nama template resep, mis. ISPA Anak, Hipertensi Standar"
+    },
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref User dokter pemilik template"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "diagnosis_tag": {
+      "type": "string",
+      "description": "Tag diagnosis terkait, mis. Common cold, Hipertensi"
+    },
+    "items": {
+      "type": "array",
+      "description": "Daftar obat non-racik dalam template",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "substituted": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "racikan_data": {
+      "type": "object",
+      "description": "Data racikan jika template menyertakan obat racik",
+      "properties": {
+        "racikan_name": {
+          "type": "string"
+        },
+        "bentuk_racikan": {
+          "type": "string"
+        },
+        "jumlah_resep": {
+          "type": "number"
+        },
+        "jumlah_ambil": {
+          "type": "number"
+        },
+        "signa": {
+          "type": "string"
+        },
+        "components": {
+          "type": "array"
+        },
+        "kemasan_fee": {
+          "type": "number"
+        },
+        "jasa_racik_fee": {
+          "type": "number"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "has_racikan": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

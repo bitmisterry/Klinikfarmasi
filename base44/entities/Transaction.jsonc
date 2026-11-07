@@ -1,0 +1,192 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "invoice_number": {
+      "type": "string",
+      "description": "Nomor invoice, mis. INV20260921001"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Apotek/POS",
+        "Klinik",
+        "Resep",
+        "Bebas",
+        "Pendapatan Lain"
+      ],
+      "default": "Apotek/POS",
+      "description": "Kategori: Apotek/POS (penjualan obat), Klinik (jasa dokter), Resep, Bebas, Pendapatan Lain"
+    },
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "queue_entry_id": {
+      "type": "string"
+    },
+    "prescription_id": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicine_id": {
+            "type": "string"
+          },
+          "medicine_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number",
+            "description": "Harga satuan"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "batch_number": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "default": 0
+    },
+    "discount": {
+      "type": "number",
+      "default": 0
+    },
+    "discount_type": {
+      "type": "string",
+      "enum": [
+        "Tidak Ada",
+        "Keluarga",
+        "Karyawan",
+        "Custom"
+      ],
+      "default": "Tidak Ada",
+      "description": "Skema diskon: Keluarga, Karyawan, atau Custom"
+    },
+    "discount_value": {
+      "type": "number",
+      "default": 0,
+      "description": "Nilai diskon: persentase (%) atau nominal (Rp) tergantung skema"
+    },
+    "embalase_fee": {
+      "type": "number",
+      "default": 0,
+      "description": "Biaya embalase resep sebagai baris terpisah"
+    },
+    "consultation_fee": {
+      "type": "number",
+      "default": 0,
+      "description": "Biaya pemeriksaan dokter"
+    },
+    "other_fees": {
+      "type": "number",
+      "default": 0
+    },
+    "total": {
+      "type": "number",
+      "default": 0
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tunai",
+        "Debit",
+        "Kredit",
+        "QRIS",
+        "Transfer",
+        "BPJS"
+      ],
+      "default": "Tunai"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "Belum Bayar",
+        "Lunas",
+        "Refund",
+        "Void"
+      ],
+      "default": "Belum Bayar"
+    },
+    "paid_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "change_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "cash_session_id": {
+      "type": "string"
+    },
+    "cashier_id": {
+      "type": "string"
+    },
+    "cashier_name": {
+      "type": "string"
+    },
+    "transaction_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "void_reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "invoice_number",
+    "type",
+    "total",
+    "payment_status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Apoteker"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Kasir"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Asisten Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

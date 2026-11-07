@@ -1,0 +1,157 @@
+{
+  "name": "TreatmentPlan",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "doctor_id": {
+      "type": "string",
+      "description": "Ref User dokter"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Nama rencana perawatan, mis. Perawatan Gigi Lengkap"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "Gigi",
+        "Anak",
+        "Umum"
+      ],
+      "default": "Gigi"
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "session_number": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string",
+            "description": "Deskripsi tindakan sesi ini"
+          },
+          "tooth_numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "estimated_cost": {
+            "type": "number",
+            "default": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Dijadwalkan",
+              "Berlangsung",
+              "Selesai",
+              "Dibatalkan"
+            ],
+            "default": "Dijadwalkan"
+          },
+          "scheduled_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "appointment_id": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Daftar sesi perawatan bertahap"
+    },
+    "total_estimate": {
+      "type": "number",
+      "default": 0,
+      "description": "Total estimasi biaya semua sesi"
+    },
+    "total_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Aktif",
+        "Selesai",
+        "Dibatalkan"
+      ],
+      "default": "Aktif"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "plan_name",
+    "status"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Gigi"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Gigi"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Front Office"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

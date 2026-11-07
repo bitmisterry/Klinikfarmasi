@@ -1,0 +1,145 @@
+{
+  "name": "GrowthRecord",
+  "type": "object",
+  "properties": {
+    "patient_id": {
+      "type": "string",
+      "description": "Ref Patient"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "age_months": {
+      "type": "number",
+      "description": "Usia dalam bulan saat kunjungan"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "L",
+        "P"
+      ]
+    },
+    "weight": {
+      "type": "number",
+      "description": "Berat badan (kg)"
+    },
+    "height": {
+      "type": "number",
+      "description": "Tinggi badan (cm)"
+    },
+    "head_circumference": {
+      "type": "number",
+      "description": "Lingkar kepala (cm)"
+    },
+    "percentile_bb_u": {
+      "type": "number",
+      "description": "Persentil Berat Badan menurut Umur"
+    },
+    "percentile_tb_u": {
+      "type": "number",
+      "description": "Persentil Tinggi Badan menurut Umur"
+    },
+    "percentile_bb_tb": {
+      "type": "number",
+      "description": "Persentil Berat Badan menurut Tinggi Badan"
+    },
+    "z_score_bb_u": {
+      "type": "number",
+      "description": "Z-score BB/U"
+    },
+    "z_score_tb_u": {
+      "type": "number",
+      "description": "Z-score TB/U"
+    },
+    "z_score_bb_tb": {
+      "type": "number",
+      "description": "Z-score BB/TB"
+    },
+    "bmi": {
+      "type": "number",
+      "description": "Body Mass Index (auto-calculated)"
+    },
+    "nutrition_status": {
+      "type": "string",
+      "enum": [
+        "Sangat Kurus",
+        "Kurus",
+        "Normal",
+        "Gemuk",
+        "Obesitas"
+      ],
+      "description": "Status gizi berdasarkan Z-score"
+    },
+    "doctor_id": {
+      "type": "string"
+    },
+    "doctor_name": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "visit_date",
+    "weight",
+    "height"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Anak"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Perawat"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter Spesialis Anak"
+          }
+        },
+        {
+          "user_condition": {
+            "data.clinic_role": "Dokter"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

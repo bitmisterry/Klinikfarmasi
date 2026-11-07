@@ -1,0 +1,54 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "channel": {
+      "type": "string",
+      "description": "all-staff, dokter, apoteker, kasir, atau dm-{userA}-{userB} untuk pesan langsung"
+    },
+    "sender_id": {
+      "type": "string"
+    },
+    "sender_name": {
+      "type": "string"
+    },
+    "sender_role": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL lampiran foto hasil pemeriksaan / dokumen medis"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Nama file lampiran"
+    }
+  },
+  "required": [
+    "channel",
+    "sender_name",
+    "message",
+    "timestamp"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
